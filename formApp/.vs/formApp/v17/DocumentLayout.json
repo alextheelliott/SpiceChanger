@@ -1,0 +1,36 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\projects\\SpiceChanger\\formApp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|c:\\projects\\spicechanger\\formapp\\formapp\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|solutionrelative:formapp\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Form1.cs [Design]",
+              "DocumentMoniker": "C:\\projects\\SpiceChanger\\formApp\\formApp\\Form1.cs",
+              "RelativeDocumentMoniker": "formApp\\Form1.cs",
+              "ToolTip": "C:\\projects\\SpiceChanger\\formApp\\formApp\\Form1.cs [Design]",
+              "RelativeToolTip": "formApp\\Form1.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-05T05:27:49.634Z",
+              "EditorCaption": " [Design]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
