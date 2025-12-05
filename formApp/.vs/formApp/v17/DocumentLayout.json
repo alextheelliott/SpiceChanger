@@ -5,6 +5,14 @@
     {
       "AbsoluteMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|c:\\projects\\spicechanger\\formapp\\formapp\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|solutionrelative:formapp\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|c:\\projects\\spicechanger\\formapp\\formapp\\spicemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|solutionrelative:formapp\\spicemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|c:\\projects\\spicechanger\\formapp\\formapp\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|solutionrelative:formapp\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,8 +22,34 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 2,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SpiceManager.cs",
+              "DocumentMoniker": "C:\\projects\\SpiceChanger\\formApp\\formApp\\SpiceManager.cs",
+              "RelativeDocumentMoniker": "formApp\\SpiceManager.cs",
+              "ToolTip": "C:\\projects\\SpiceChanger\\formApp\\formApp\\SpiceManager.cs",
+              "RelativeToolTip": "formApp\\SpiceManager.cs",
+              "ViewState": "AgIAADgAAAAA0czMzAwgwDcAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-05T05:40:04.395Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "C:\\projects\\SpiceChanger\\formApp\\formApp\\Form1.cs",
+              "RelativeDocumentMoniker": "formApp\\Form1.cs",
+              "ToolTip": "C:\\projects\\SpiceChanger\\formApp\\formApp\\Form1.cs",
+              "RelativeToolTip": "formApp\\Form1.cs",
+              "ViewState": "AgIAACsAAAAAMjMzM/MiwDAAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-05T07:24:25.928Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,

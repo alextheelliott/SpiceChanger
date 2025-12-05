@@ -1,0 +1,10 @@
+C:\projects\SpiceChanger\formApp\formApp\bin\Debug\formApp.exe.config
+C:\projects\SpiceChanger\formApp\formApp\bin\Debug\formApp.exe
+C:\projects\SpiceChanger\formApp\formApp\bin\Debug\formApp.pdb
+C:\projects\SpiceChanger\formApp\formApp\obj\Debug\formApp.csproj.AssemblyReference.cache
+C:\projects\SpiceChanger\formApp\formApp\obj\Debug\formApp.Form1.resources
+C:\projects\SpiceChanger\formApp\formApp\obj\Debug\formApp.Properties.Resources.resources
+C:\projects\SpiceChanger\formApp\formApp\obj\Debug\formApp.csproj.GenerateResource.cache
+C:\projects\SpiceChanger\formApp\formApp\obj\Debug\formApp.csproj.CoreCompileInputs.cache
+C:\projects\SpiceChanger\formApp\formApp\obj\Debug\formApp.exe
+C:\projects\SpiceChanger\formApp\formApp\obj\Debug\formApp.pdb
