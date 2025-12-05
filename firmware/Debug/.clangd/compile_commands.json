@@ -1,0 +1,117 @@
+[
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/adc10_b.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/comp_d.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/crc.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/cs.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/dma.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/eusci_a_spi.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/eusci_a_uart.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/eusci_b_i2c.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/eusci_b_spi.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/framctl.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/gpio.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/mpu.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/mpy32.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/pmm.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/ref.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/rtc_b.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/sfr.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/sysctl.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/timer_a.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/timer_b.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/tlv.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx/wdt_a.c"
+   },
+   {
+      "directory" : "C:/projects/SpiceChanger/firmware/Debug",
+      "command"   : "clang++ -I\"C:/ti/ccs2030/ccs/ccs_base/msp430/include\" -I\"C:/projects/SpiceChanger/firmware\" -I\"C:/projects/SpiceChanger/firmware/driverlib/MSP430FR57xx\" -I\"C:/ti/ccs2030/ccs/tools/compiler/ti-cgt-msp430_21.6.1.LTS/include\" -D__MSP430FR5739__ -D_MPU_ENABLE -DDEPRECATED -xc",
+      "file"      : "C:/projects/SpiceChanger/firmware/main.c"
+   }
+]
