@@ -28,7 +28,14 @@ volatile Buffer taskBuffer = {{}, 0, 0, 0};
 
 volatile int started = 0;
 volatile int state = 0;
-volatile long ticks = 0;
+
+volatile bool spiceSeen = false;
+volatile long encTicks = 0;
+volatile long desTicks = 0;
+volatile unsigned int stepsRem = 0;
+volatile unsigned char stepperDir = 0;
+
+volatile unsigned char activeIndex;
 
 // ====================================================================== Prototypes
 
@@ -106,6 +113,25 @@ void init(void) {
     P3OUT |= BIT6;
     P3OUT &= ~BIT7;
 
+    // ------------------------------------------------------------------ Sensors
+
+    // Configure P1.3 as input
+    P1DIR &= ~BIT3;
+    P1REN |= BIT3;    // Enable pull resistor (optional but recommended)
+    P1OUT &= ~BIT3;   // pull-down (change to |= BIT3 for pull-up)
+    // Read initial state
+    spiceSeen = !(P1IN & BIT3);
+
+    // Interrupt edge select:
+    if (P1IN & BIT3)
+        P1IES |= BIT3;     // High → Low
+    else
+        P1IES &= ~BIT3;    // Low → High
+
+    // Clear any pending interrupt & Enable interrupt
+    P1IFG &= ~BIT3;
+    P1IE |= BIT3;
+
     // ------------------------------------------------------------------ Timer A
 
     // Encoder B setup
@@ -163,45 +189,18 @@ void init(void) {
 void processPacket(void) {
     int start = bufferPop(&rxBuffer);
     if (start == START_BYTE) {
-        int commandByte = bufferPop(&rxBuffer);
-        int dataByte1 = bufferPop(&rxBuffer); // Direction
-        int dataByte2 = bufferPop(&rxBuffer); // Speed
-        int dataByte3 = bufferPop(&rxBuffer); // Distance / Quantity
-
-        uartTransmit(dataByte1);
-        uartTransmit(dataByte2);
-        uartTransmit(dataByte3);
-
-        int direc;
-
-        switch(dataByte1)
-        {
-            case 0x00: // CW
-                direc =  1;
-                break;
-            case 0x01: // CCW
-                direc = -1;
-                break;
-            default:
-                direc =  0;
-                break;
-        }
+        int commandByte = bufferPop(&rxBuffer); // Command
+        int index = bufferPop(&rxBuffer);   // Index
 
         switch(commandByte)
         {
-            case 0x01: // Command Word 1 : Step
+            case 0x00: // Give Spice
+                bufferPush(&taskBuffer, (index << 1 && 0x00));
                 break;
-            case 0x02: // Command Word 2 : Continuous
-                setMotorSpeedDirection(direc * dataByte2);
+            case 0x01: // Return Spice
+                bufferPush(&taskBuffer, (index << 1 && 0x01));
                 break;
-            case 0x03: // Command Word 2 : Finite Distance
-                setMotorSpeedDirection(direc * dataByte2);
-                setMotorDistance(dataByte3);
-                break;
-            case 0x00: // Command 0: Stop
-            default:
-                P3OUT |= BIT6 + BIT7;
-                break;
+            default: break;
         }
     }
 }
@@ -209,58 +208,67 @@ void processPacket(void) {
 void stateMachine(void) {
     switch (state) {
         case 0: // Waiting for Task
-
+            if (taskBuffer.count > 0) {
+                int task = bufferPop(&taskBuffer);
+                state = (task && 0x01 == 0x00) ? 1 : 11;
+                activeIndex = task >> 1;
+            }
             break;
         // -------------------------------------------------------------- Give Spice
-        case 1: // Give Spice - Step 1
-
+        case 1: // Give Spice - Step 1 - Rotate to correct index
+            desTicks = 100 * activeIndex + 200; // TODO replace with real values
+            state = 2;
             break;
-        case 2: // Give Spice - Step 2
-
+        case 2: // Give Spice - Step 2 - Wait until index matches (encoder ticks is correct)
+            if (abs(desTicks - encTicks) < 5) { state = 3; }
             break;
-        case 3: // Give Spice - Step 3
-        
+        case 3: // Give Spice - Step 3 - Extend the pusher arm
+            stepperDir = 0;
+            stepsRem = 1000; // TODO replace with real values
+            state = 4;
             break;
-        case 4: // Give Spice - Step 4
-        
+        case 4: // Give Spice - Step 4 - Wait until arm is pushed (stepper steps is completed)
+            if (stepsRem < 1) { state = 5; }
             break;
-        case 5: // Give Spice - Step 5
-        
+        case 5: // Give Spice - Step 5 - Wait until the user TAKES the container (IR sensor)
+            if (!spiceSeen) { state = 6; }
             break;
-        case 6: // Give Spice - Step 6
-        
+        case 6: // Give Spice - Step 6 - Retract the pusher arm
+            stepperDir = 1;
+            stepsRem = 1000;
             break;
-        case 7: // Give Spice - Step 7
-
+        case 7: // Give Spice - Step 7 - Wait until arm is ractracted (stepper steps is completed)
+            if (stepsRem < 1) { state = 8; }
             break;
-        case 8: // Give Spice - Step 8
-        
+        case 8: // Give Spice - Step 8 - Continue onto next task
+            state = 0;
             break;
         // -------------------------------------------------------------- Return Spice
-        case 11: // Return Spice - Step 1
+        case 11: // Return Spice - Step 1 - Rotate to correct index
+
+            break;
+        case 12: // Return Spice - Step 2 - Wait until index matches (encoder ticks is correct)
+
+            break;
+        case 13: // Return Spice - Step 3 - Extend the pusher arm
         
             break;
-        case 12: // Return Spice - Step 2
+        case 14: // Return Spice - Step 4 - Wait until arm is pushed (stepper steps is completed)
         
             break;
-        case 13: // Return Spice - Step 3
+        case 15: // Return Spice - Step 5 - Wait until the user RETURNS the container (IR sensor)
         
             break;
-        case 14: // Return Spice - Step 4
+        case 16: // Return Spice - Step 6 - Retract the pusher arm
         
             break;
-        case 15: // Return Spice - Step 5
+        case 17: // Return Spice - Step 7 - Wait until arm is ractracted (stepper steps is completed)
         
             break;
-        case 16: // Return Spice - Step 6
-        
+        case 18: // Return Spice - Step 8 - Continue onto next task
+            state = 0;
             break;
-        case 17: // Return Spice - Step 7
-        
-            break;
-        case 18: // Return Spice - Step 8
-        
-            break;
+        default: state = 0; // Handle brocken edge cases
     }
 }
 
@@ -268,10 +276,9 @@ void stateMachine(void) {
 
 void main (void) {
     init();
+    __bis_SR_register(GIE);  // Enable interrupts globally
 
     // ------------------------------------------------------------------ Main Loop
-
-    __bis_SR_register(GIE);  // Enable interrupts globally
 
     while (1) {
         if (rxBuffer.count >= 5) {  // Ensure enough bytes for a full packet
@@ -284,12 +291,30 @@ void main (void) {
 
 // ====================================================================== ISRs
 
+#pragma vector=PORT1_VECTOR
+__interrupt void Port_1_ISR(void) {
+    if (P1IFG & BIT3) {
+        if (P1IN & BIT3) {
+            spiceSeen = false;
+            P1IES |= BIT3; // next interrupt on falling edge
+        } else {
+            spiceSeen = true;
+            P1IES &= ~BIT3; // next interrupt on rising edge
+        }
+
+        // Clear flag
+        P1IFG &= ~BIT3;
+    }
+}
+
 #pragma vector = TIMER1_B0_VECTOR
 __interrupt void TIMER1_B0_ISR(void) {
-    ticks = ticks + TA0R - TA1R;
+    encTicks = encTicks + TA0R - TA1R;
 
     TA0R = 0;
     TA1R = 0;
+
+    // should PID be updated here as well?
 }
 
 #pragma vector = USCI_A1_VECTOR
