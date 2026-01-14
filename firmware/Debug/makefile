@@ -153,8 +153,7 @@ EXE_OUTPUTS__QUOTED += \
 
 
 # All Target
-all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "firmware.out"
+all: firmware.out
 
 # Tool invocations
 firmware.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
