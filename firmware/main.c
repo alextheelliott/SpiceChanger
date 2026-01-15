@@ -67,8 +67,8 @@ void uartTransmit(int byte) {
 void setMotorSpeedDirection(int value) {
     if (value > 100) {
         value = 100;
-    } else if (value < 0) {
-        value = 0;
+    } else if (value < -100) {
+        value = -100;
     }
     
     // Speed
@@ -203,7 +203,7 @@ void init(void) {
     TB0CCTL1 = OUTMOD_7;
     TB0CCTL2 = OUTMOD_7;
     TB0CCR1 = 60 * TB0CCR0 / 100; // Const. for Stepper Moter
-    TB0CCR2 = 50 * TB0CCR0 / 100; // Variable for DC Motor
+    TB0CCR2 = 0 * TB0CCR0 / 100; // Variable for DC Motor
 
     // set PJ.0-3 to outputs for the offboard motor driver
     PJDIR |= BIT0 | BIT1 | BIT2 | BIT3;
@@ -243,10 +243,10 @@ void processPacket(void) {
         switch(commandByte)
         {
             case 0x00: // Give Spice
-                bufferPush(&taskBuffer, (index << 1 && 0x00));
+                bufferPush(&taskBuffer, (index << 1) | (0x00));
                 break;
             case 0x01: // Return Spice
-                bufferPush(&taskBuffer, (index << 1 && 0x01));
+                bufferPush(&taskBuffer, (index << 1) | (0x01));
                 break;
             default: break;
         }
@@ -258,36 +258,40 @@ void stateMachine(void) {
         case 0: // Waiting for Task
             if (taskBuffer.count > 0) {
                 int task = bufferPop(&taskBuffer);
-                state = (task && 0x01 == 0x00) ? 1 : 11;
+                state = ((task & 0x01) == 0x00) ? 1 : 11;
                 activeIndex = task >> 1;
+                uartTransmit(state);
+                //uartTransmit(activeIndex);
             }
             break;
         // -------------------------------------------------------------- Give Spice
         case 1: // Give Spice - Step 1 - Rotate to correct index
-            desTicks = 100 * activeIndex + 200; // TODO replace with real values
+            desTicks = 100 * activeIndex + 100; // TODO replace with real values
             state = 2;
-            break;
+            uartTransmit(0x02); break;
         case 2: // Give Spice - Step 2 - Wait until index matches (encoder ticks is correct)
-            if (abs(desTicks - encTicks) < 5) { state = 3; }
+            if (abs(desTicks - encTicks) < 50) { state = 3; uartTransmit(0x03); }
             break;
         case 3: // Give Spice - Step 3 - Extend the pusher arm
             stepperDir = -1;
             stepsRem = 1000; // TODO replace with real values
             state = 4;
+            uartTransmit(0x04);
             break;
         case 4: // Give Spice - Step 4 - Wait until arm is pushed (stepper steps is completed)
-            if (stepsRem < 1) { state = 5; }
+            if (stepsRem < 1) { state = 5; uartTransmit(0x05);}
             break;
         case 5: // Give Spice - Step 5 - Wait until the user TAKES the container (IR sensor)
-            if (!spiceSeen) { state = 6; }
+            if (!spiceSeen) { state = 6; uartTransmit(0x06); }
             break;
         case 6: // Give Spice - Step 6 - Retract the pusher arm
             stepperDir = 1;
             stepsRem = 1000;
             state = 7;
+            uartTransmit(0x07);
             break;
         case 7: // Give Spice - Step 7 - Wait until arm is ractracted (stepper steps is completed)
-            if (stepsRem < 1) { state = 8; }
+            if (stepsRem < 1) { state = 8; uartTransmit(0x08); }
             break;
         case 8: // Give Spice - Step 8 - Continue onto next task
             state = 0;
@@ -330,7 +334,7 @@ void main (void) {
     // ------------------------------------------------------------------ Main Loop
 
     while (1) {
-        if (rxBuffer.count >= 5) {  // Ensure enough bytes for a full packet
+        if (rxBuffer.count >= 3) {  // Ensure enough bytes for a full packet
             processPacket();  // Process incoming packet
         }
 
@@ -358,7 +362,7 @@ __interrupt void Port_1_ISR(void) {
 
 #pragma vector = TIMER1_B0_VECTOR
 __interrupt void TIMER1_B0_ISR(void) {
-    encTicks = encTicks + TA0R - TA1R;
+    encTicks = encTicks + TA1R - TA0R;
     TA0R = 0;
     TA1R = 0;
 
@@ -367,7 +371,8 @@ __interrupt void TIMER1_B0_ISR(void) {
         stepsRem--;
     }
 
-    setMotorSpeedDirection(0.5 * (desTicks - encTicks)); // todo replace Kp
+    setMotorSpeedDirection(10 * (desTicks - encTicks)); // todo replace Kp
+    //uartTransmit(desTicks - encTicks);
 }
 
 #pragma vector = USCI_A1_VECTOR
