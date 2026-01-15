@@ -208,10 +208,11 @@ void init(void) {
     // set PJ.0-3 to outputs for the offboard motor driver
     PJDIR |= BIT0 | BIT1 | BIT2 | BIT3;
 
-    // Encoder Reporting Timer
     TB1CTL = TBSSEL__SMCLK | ID__8 | MC__STOP | TBCLR; 
-    TB1CCR0 = 5000 - 1;   // 200 Hz PWM
-    TB1CCTL0 = CCIE; 
+    TB1CCTL1 = CCIE; 
+    TB1CCTL2 = CCIE; 
+    TB1CCR1 = 5000 - 1; // 200 Hz, Encoder Update
+    TB1CCR2 = 5000 - 1;  // 2 kHz, Stepper Step Rate
 
     // ------------------------------------------------------------------ UART1
 
@@ -360,19 +361,29 @@ __interrupt void Port_1_ISR(void) {
     }
 }
 
-#pragma vector = TIMER1_B0_VECTOR
-__interrupt void TIMER1_B0_ISR(void) {
-    encTicks = encTicks + TA1R - TA0R;
-    TA0R = 0;
-    TA1R = 0;
+#pragma vector = TIMER1_B1_VECTOR
+__interrupt void TIMER1_B1_ISR(void) {
+    switch (TB1IV) {
+        case TB1IV_TB1CCR1:    
+            encTicks = encTicks + TA1R - TA0R;
+            TA0R = 0;
+            TA1R = 0;
 
-    if (stepsRem > 0) {
-        stepMotor();
-        stepsRem--;
+            setMotorSpeedDirection(10 * (desTicks - encTicks)); // todo replace Kp
+
+            TB1CCR1 += 5000 - 1;
+            break;
+        case TB1IV_TB1CCR2:
+            if (stepsRem > 0) {
+                stepMotor();
+                stepsRem--;
+            }
+
+            TB1CCR2 += 5000 - 1;
+            break;
+        default:
+            break;
     }
-
-    setMotorSpeedDirection(10 * (desTicks - encTicks)); // todo replace Kp
-    //uartTransmit(desTicks - encTicks);
 }
 
 #pragma vector = USCI_A1_VECTOR
