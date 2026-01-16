@@ -28,29 +28,37 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.gb1 = new System.Windows.Forms.GroupBox();
             this.lbSpicesStored = new System.Windows.Forms.ListBox();
             this.gb2 = new System.Windows.Forms.GroupBox();
             this.lbSpicesLent = new System.Windows.Forms.ListBox();
             this.btnReq = new System.Windows.Forms.Button();
-            this.btnStartStopRet = new System.Windows.Forms.Button();
             this.btnRet = new System.Windows.Forms.Button();
-            this.btnStartStopRes = new System.Windows.Forms.Button();
-            this.tbSpiceToRestock = new System.Windows.Forms.TextBox();
-            this.btnRes = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.btnResRem = new System.Windows.Forms.Button();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.lbSpicesRequesting = new System.Windows.Forms.ListBox();
+            this.lbSpicesReturning = new System.Windows.Forms.ListBox();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.btnConn = new System.Windows.Forms.Button();
+            this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.gb1.SuspendLayout();
             this.gb2.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
             // gb1
             // 
             this.gb1.Controls.Add(this.lbSpicesStored);
-            this.gb1.Location = new System.Drawing.Point(12, 12);
+            this.gb1.Controls.Add(this.btnReq);
+            this.gb1.Location = new System.Drawing.Point(6, 6);
             this.gb1.Name = "gb1";
-            this.gb1.Size = new System.Drawing.Size(250, 200);
+            this.gb1.Size = new System.Drawing.Size(250, 358);
             this.gb1.TabIndex = 0;
             this.gb1.TabStop = false;
             this.gb1.Text = "Spices Stored";
@@ -65,16 +73,16 @@
             "3"});
             this.lbSpicesStored.Location = new System.Drawing.Point(10, 30);
             this.lbSpicesStored.Name = "lbSpicesStored";
-            this.lbSpicesStored.Size = new System.Drawing.Size(226, 154);
+            this.lbSpicesStored.Size = new System.Drawing.Size(226, 254);
             this.lbSpicesStored.TabIndex = 1;
-            this.lbSpicesStored.SelectedValueChanged += new System.EventHandler(this.lbSpicesStored_SelectedValueChanged);
             // 
             // gb2
             // 
             this.gb2.Controls.Add(this.lbSpicesLent);
-            this.gb2.Location = new System.Drawing.Point(273, 12);
+            this.gb2.Controls.Add(this.btnRet);
+            this.gb2.Location = new System.Drawing.Point(542, 6);
             this.gb2.Name = "gb2";
-            this.gb2.Size = new System.Drawing.Size(250, 200);
+            this.gb2.Size = new System.Drawing.Size(250, 358);
             this.gb2.TabIndex = 2;
             this.gb2.TabStop = false;
             this.gb2.Text = "Spices Lent";
@@ -87,108 +95,141 @@
             ""});
             this.lbSpicesLent.Location = new System.Drawing.Point(12, 30);
             this.lbSpicesLent.Name = "lbSpicesLent";
-            this.lbSpicesLent.Size = new System.Drawing.Size(226, 154);
+            this.lbSpicesLent.Size = new System.Drawing.Size(226, 254);
             this.lbSpicesLent.TabIndex = 2;
-            this.lbSpicesLent.SelectedValueChanged += new System.EventHandler(this.lbSpicesLent_SelectedValueChanged);
             // 
             // btnReq
             // 
-            this.btnReq.Location = new System.Drawing.Point(12, 218);
+            this.btnReq.Location = new System.Drawing.Point(10, 300);
             this.btnReq.Name = "btnReq";
-            this.btnReq.Size = new System.Drawing.Size(250, 153);
+            this.btnReq.Size = new System.Drawing.Size(226, 42);
             this.btnReq.TabIndex = 3;
-            this.btnReq.Text = "Request:";
+            this.btnReq.Text = "Request";
             this.btnReq.UseVisualStyleBackColor = true;
             this.btnReq.Click += new System.EventHandler(this.btnReq_Click);
             // 
-            // btnStartStopRet
-            // 
-            this.btnStartStopRet.Location = new System.Drawing.Point(273, 218);
-            this.btnStartStopRet.Name = "btnStartStopRet";
-            this.btnStartStopRet.Size = new System.Drawing.Size(250, 47);
-            this.btnStartStopRet.TabIndex = 4;
-            this.btnStartStopRet.Text = "Start Returning";
-            this.btnStartStopRet.UseVisualStyleBackColor = true;
-            this.btnStartStopRet.Click += new System.EventHandler(this.btnStartStopRet_Click);
-            // 
             // btnRet
             // 
-            this.btnRet.Location = new System.Drawing.Point(273, 271);
+            this.btnRet.Location = new System.Drawing.Point(12, 300);
             this.btnRet.Name = "btnRet";
-            this.btnRet.Size = new System.Drawing.Size(250, 100);
+            this.btnRet.Size = new System.Drawing.Size(230, 42);
             this.btnRet.TabIndex = 5;
-            this.btnRet.Text = "Return:";
+            this.btnRet.Text = "Return";
             this.btnRet.UseVisualStyleBackColor = true;
             this.btnRet.Click += new System.EventHandler(this.btnRet_Click);
             // 
-            // btnStartStopRes
+            // tabControl1
             // 
-            this.btnStartStopRes.Location = new System.Drawing.Point(6, 30);
-            this.btnStartStopRes.Name = "btnStartStopRes";
-            this.btnStartStopRes.Size = new System.Drawing.Size(242, 91);
-            this.btnStartStopRes.TabIndex = 6;
-            this.btnStartStopRes.Text = "Start Restocking";
-            this.btnStartStopRes.UseVisualStyleBackColor = true;
-            this.btnStartStopRes.Click += new System.EventHandler(this.btnStartStopRes_Click);
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Location = new System.Drawing.Point(12, 12);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(814, 418);
+            this.tabControl1.TabIndex = 6;
             // 
-            // tbSpiceToRestock
+            // tabPage1
             // 
-            this.tbSpiceToRestock.Location = new System.Drawing.Point(20, 132);
-            this.tbSpiceToRestock.Name = "tbSpiceToRestock";
-            this.tbSpiceToRestock.Size = new System.Drawing.Size(215, 31);
-            this.tbSpiceToRestock.TabIndex = 7;
+            this.tabPage1.Controls.Add(this.lbSpicesReturning);
+            this.tabPage1.Controls.Add(this.lbSpicesRequesting);
+            this.tabPage1.Controls.Add(this.gb1);
+            this.tabPage1.Controls.Add(this.gb2);
+            this.tabPage1.Location = new System.Drawing.Point(8, 39);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(798, 371);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Request";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // btnRes
+            // tabPage2
             // 
-            this.btnRes.Location = new System.Drawing.Point(6, 174);
-            this.btnRes.Name = "btnRes";
-            this.btnRes.Size = new System.Drawing.Size(242, 86);
-            this.btnRes.TabIndex = 8;
-            this.btnRes.Text = "Add to Stock";
-            this.btnRes.UseVisualStyleBackColor = true;
-            this.btnRes.Click += new System.EventHandler(this.btnRes_Click);
+            this.tabPage2.Location = new System.Drawing.Point(8, 39);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(798, 371);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Restock";
+            this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // groupBox1
+            // tabPage3
             // 
-            this.groupBox1.Controls.Add(this.btnResRem);
-            this.groupBox1.Controls.Add(this.btnStartStopRes);
-            this.groupBox1.Controls.Add(this.btnRes);
-            this.groupBox1.Controls.Add(this.tbSpiceToRestock);
-            this.groupBox1.Location = new System.Drawing.Point(534, 12);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(254, 359);
-            this.groupBox1.TabIndex = 9;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Restock Spices";
+            this.tabPage3.Controls.Add(this.btnConn);
+            this.tabPage3.Controls.Add(this.comboBox1);
+            this.tabPage3.Location = new System.Drawing.Point(8, 39);
+            this.tabPage3.Name = "tabPage3";
+            this.tabPage3.Size = new System.Drawing.Size(798, 371);
+            this.tabPage3.TabIndex = 2;
+            this.tabPage3.Text = "COM";
+            this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // btnResRem
+            // lbSpicesRequesting
             // 
-            this.btnResRem.Location = new System.Drawing.Point(6, 266);
-            this.btnResRem.Name = "btnResRem";
-            this.btnResRem.Size = new System.Drawing.Size(242, 86);
-            this.btnResRem.TabIndex = 9;
-            this.btnResRem.Text = "Remove from Stock";
-            this.btnResRem.UseVisualStyleBackColor = true;
-            this.btnResRem.Click += new System.EventHandler(this.btnResRem_Click);
+            this.lbSpicesRequesting.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbSpicesRequesting.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lbSpicesRequesting.FormattingEnabled = true;
+            this.lbSpicesRequesting.ItemHeight = 25;
+            this.lbSpicesRequesting.Location = new System.Drawing.Point(271, 24);
+            this.lbSpicesRequesting.Name = "lbSpicesRequesting";
+            this.lbSpicesRequesting.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.lbSpicesRequesting.Size = new System.Drawing.Size(256, 154);
+            this.lbSpicesRequesting.TabIndex = 3;
+            // 
+            // lbSpicesReturning
+            // 
+            this.lbSpicesReturning.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbSpicesReturning.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lbSpicesReturning.FormattingEnabled = true;
+            this.lbSpicesReturning.ItemHeight = 25;
+            this.lbSpicesReturning.Location = new System.Drawing.Point(271, 196);
+            this.lbSpicesReturning.Name = "lbSpicesReturning";
+            this.lbSpicesReturning.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.lbSpicesReturning.Size = new System.Drawing.Size(256, 154);
+            this.lbSpicesReturning.TabIndex = 4;
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(25, 24);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(549, 33);
+            this.comboBox1.TabIndex = 0;
+            this.comboBox1.DropDown += new System.EventHandler(this.comboBox1_DropDown);
+            // 
+            // btnConn
+            // 
+            this.btnConn.Location = new System.Drawing.Point(590, 24);
+            this.btnConn.Name = "btnConn";
+            this.btnConn.Size = new System.Drawing.Size(183, 45);
+            this.btnConn.TabIndex = 1;
+            this.btnConn.Text = "Connect";
+            this.btnConn.UseVisualStyleBackColor = true;
+            this.btnConn.Click += new System.EventHandler(this.btnConn_Click);
+            // 
+            // serialPort1
+            // 
+            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
+            // 
+            // timer1
+            // 
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 387);
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.btnRet);
-            this.Controls.Add(this.btnStartStopRet);
-            this.Controls.Add(this.btnReq);
-            this.Controls.Add(this.gb2);
-            this.Controls.Add(this.gb1);
+            this.ClientSize = new System.Drawing.Size(835, 444);
+            this.Controls.Add(this.tabControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "Form1";
             this.Text = "Spice Storage App";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.gb1.ResumeLayout(false);
             this.gb2.ResumeLayout(false);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -200,13 +241,17 @@
         private System.Windows.Forms.GroupBox gb2;
         private System.Windows.Forms.ListBox lbSpicesLent;
         private System.Windows.Forms.Button btnReq;
-        private System.Windows.Forms.Button btnStartStopRet;
         private System.Windows.Forms.Button btnRet;
-        private System.Windows.Forms.Button btnStartStopRes;
-        private System.Windows.Forms.TextBox tbSpiceToRestock;
-        private System.Windows.Forms.Button btnRes;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Button btnResRem;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.ListBox lbSpicesReturning;
+        private System.Windows.Forms.ListBox lbSpicesRequesting;
+        private System.Windows.Forms.Button btnConn;
+        private System.Windows.Forms.ComboBox comboBox1;
+        private System.IO.Ports.SerialPort serialPort1;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

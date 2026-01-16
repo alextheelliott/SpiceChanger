@@ -7,26 +7,22 @@ using System.Threading.Tasks;
 
 namespace formApp
 {
-    public enum SpiceManagerState
-    {
-        Requesting,
-        Returning,
-        Restocking
-    }
 
     public sealed class SpiceManager
     {
         private static SpiceManager instance;
 
-        private SpiceManagerState _state;
         private Dictionary<string,int> _spicesStored;
+        private Dictionary<string,int> _spicesRequesting;
         private Dictionary<string,int> _spicesLent;
+        private Dictionary<string,int> _spicesReturning;
 
         private SpiceManager() 
         {
-            _state = SpiceManagerState.Requesting;
             _spicesStored = new Dictionary<string,int>();
+            _spicesRequesting = new Dictionary<string,int>();
             _spicesLent = new Dictionary<string,int>();
+            _spicesReturning = new Dictionary<string,int>();
 
             LoadSpiceDict();
         }
@@ -69,11 +65,6 @@ namespace formApp
             }
         }
 
-        public SpiceManagerState State
-        {
-            get { return _state; }
-        }
-
         public Dictionary<string,int> SpicesStored
         {
             get { return new Dictionary<string,int>(_spicesStored); }
@@ -84,53 +75,46 @@ namespace formApp
             get { return new Dictionary<string,int>(_spicesLent); }
         }
 
-        public bool RequestSpice(string RequestedSpice)
+        public int RequestSpice(string RequestedSpice)
         {
-            if (_state != SpiceManagerState.Requesting) throw new Exception("Spice Mangaer State Violation");
-
             if (_spicesStored.ContainsKey(RequestedSpice))
             {
-                _spicesLent.Add(RequestedSpice,_spicesStored[RequestedSpice]);
+                _spicesRequesting.Add(RequestedSpice,_spicesStored[RequestedSpice]);
                 _spicesStored.Remove(RequestedSpice);
 
-                return true;
+                return _spicesRequesting[RequestedSpice];
             }
-            return false;
+            return -1;
         }
 
-        public bool ReturnSpice(string LentSpice)
+        public void ConfirmRequestSpice(string RequestedSpice)
         {
-            if (_state != SpiceManagerState.Returning) throw new Exception("Spice Mangaer State Violation");
+            if (_spicesRequesting.ContainsKey(RequestedSpice))
+            {
+                _spicesLent.Add(RequestedSpice,_spicesRequesting[RequestedSpice]);
+                _spicesRequesting.Remove(RequestedSpice);
+            }
+        }
 
+        public int ReturnSpice(string LentSpice)
+        {
             if (_spicesLent.ContainsKey(LentSpice))
             {
-                _spicesStored.Add(LentSpice, _spicesLent[LentSpice]);
+                _spicesReturning.Add(LentSpice, _spicesLent[LentSpice]);
                 _spicesLent.Remove(LentSpice);
 
-                return true;
+                return _spicesReturning[LentSpice];
             }
-            return false;
+            return -1;
         }
 
-        public void StartReturning()
+        public void ConfirmReturnSpice(string LentSpice)
         {
-            _state = SpiceManagerState.Returning;
-        }
-
-        public void StopReturning()
-        {
-            _state = SpiceManagerState.Requesting;
-        }
-
-        public void StartRestocking()
-        {
-            _state = SpiceManagerState.Restocking;
-        }
-
-        public void StopRestocking()
-        {
-            _state = SpiceManagerState.Requesting;
-            SaveSpiceDict();
+            if (_spicesReturning.ContainsKey(LentSpice))
+            {
+                _spicesStored.Add(LentSpice,_spicesReturning[LentSpice]);
+                _spicesReturning.Remove(LentSpice);
+            }
         }
 
     }
