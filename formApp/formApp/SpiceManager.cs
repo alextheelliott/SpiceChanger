@@ -70,9 +70,19 @@ namespace formApp
             get { return new Dictionary<string,int>(_spicesStored); }
         }
 
+        public Dictionary<string,int> SpicesRequesting
+        {
+            get { return new Dictionary<string,int>(_spicesRequesting); }
+        }
+
         public Dictionary<string,int> SpicesLent
         {
             get { return new Dictionary<string,int>(_spicesLent); }
+        }
+
+        public Dictionary<string,int> SpicesReturning
+        {
+            get { return new Dictionary<string,int>(_spicesReturning); }
         }
 
         public int RequestSpice(string RequestedSpice)

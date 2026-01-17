@@ -261,38 +261,35 @@ void stateMachine(void) {
                 int task = bufferPop(&taskBuffer);
                 state = ((task & 0x01) == 0x00) ? 1 : 11;
                 activeIndex = task >> 1;
-                uartTransmit(state);
-                //uartTransmit(activeIndex);
             }
             break;
         // -------------------------------------------------------------- Give Spice
         case 1: // Give Spice - Step 1 - Rotate to correct index
             desTicks = 100 * activeIndex + 100; // TODO replace with real values
             state = 2;
-            uartTransmit(0x02); break;
+            uartTransmit(0x10);
+            break;
         case 2: // Give Spice - Step 2 - Wait until index matches (encoder ticks is correct)
-            if (abs(desTicks - encTicks) < 50) { state = 3; uartTransmit(0x03); }
+            if (abs(desTicks - encTicks) < 50) { state = 3; }
             break;
         case 3: // Give Spice - Step 3 - Extend the pusher arm
             stepperDir = -1;
             stepsRem = 1000; // TODO replace with real values
             state = 4;
-            uartTransmit(0x04);
             break;
         case 4: // Give Spice - Step 4 - Wait until arm is pushed (stepper steps is completed)
-            if (stepsRem < 1) { state = 5; uartTransmit(0x05);}
+            if (stepsRem < 1) { state = 5; }
             break;
         case 5: // Give Spice - Step 5 - Wait until the user TAKES the container (IR sensor)
-            if (!spiceSeen) { state = 6; uartTransmit(0x06); }
+            if (!spiceSeen) { state = 6; uartTransmit(0x00); }
             break;
         case 6: // Give Spice - Step 6 - Retract the pusher arm
             stepperDir = 1;
             stepsRem = 1000;
             state = 7;
-            uartTransmit(0x07);
             break;
         case 7: // Give Spice - Step 7 - Wait until arm is ractracted (stepper steps is completed)
-            if (stepsRem < 1) { state = 8; uartTransmit(0x08); }
+            if (stepsRem < 1) { state = 8; }
             break;
         case 8: // Give Spice - Step 8 - Continue onto next task
             state = 0;

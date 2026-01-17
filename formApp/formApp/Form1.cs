@@ -40,7 +40,7 @@ namespace formApp
 
             int index = spiceManager.RequestSpice(lbSpicesStored.SelectedItem.ToString());
             Console.WriteLine(index.ToString());
-            sendPacket(index);
+            sendPacket(0, index);
 
             lbSpicesRequesting.Items.Add(lbSpicesStored.SelectedItem);
             lbSpicesStored.Items.Remove(lbSpicesStored.SelectedItem);
@@ -53,7 +53,7 @@ namespace formApp
 
             int index = spiceManager.ReturnSpice(lbSpicesLent.SelectedItem.ToString());
             Console.WriteLine(index.ToString());
-            sendPacket(index);
+            sendPacket(1, index);
             
             lbSpicesReturning.Items.Add(lbSpicesLent.SelectedItem);
             lbSpicesLent.Items.Remove(lbSpicesLent.SelectedItem);
@@ -65,9 +65,17 @@ namespace formApp
             foreach (KeyValuePair<string, int> entry in spiceManager.SpicesStored)
             { lbSpicesStored.Items.Add($"{entry.Key}"); }
 
+            lbSpicesRequesting.Items.Clear();
+            foreach (KeyValuePair<string, int> entry in spiceManager.SpicesRequesting)
+            { lbSpicesRequesting.Items.Add($"{entry.Key}"); }
+
             lbSpicesLent.Items.Clear();
             foreach (KeyValuePair<string, int> entry in spiceManager.SpicesLent)
             { lbSpicesLent.Items.Add($"{entry.Key}"); }
+
+            lbSpicesReturning.Items.Clear();
+            foreach (KeyValuePair<string, int> entry in spiceManager.SpicesReturning)
+            { lbSpicesReturning.Items.Add($"{entry.Key}"); }
         }
 
         private void comboBox1_DropDown(object sender, EventArgs e)
@@ -102,12 +110,13 @@ namespace formApp
             }
         }
 
-        private void sendPacket(int index)
+        private void sendPacket(int command, int index)
         {
-            byte[] bytes = new byte[2];
+            byte[] bytes = new byte[3];
             bytes[0] = 255;
-            bytes[1] = (byte) index;
-            serialPort1.Write(bytes, 0, 2);
+            bytes[1] = (byte) command;
+            bytes[2] = (byte) index;
+            serialPort1.Write(bytes, 0, 3);
         }
 
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -137,7 +146,7 @@ namespace formApp
                     startCount--;
                     if (item == 0)
                     {
-                        spiceManager.ConfirmReturnSpice(lbSpicesRequesting.Items[0].ToString());
+                        spiceManager.ConfirmRequestSpice(lbSpicesRequesting.Items[0].ToString());
                         
                         lbSpicesLent.Items.Add(lbSpicesRequesting.Items[0]);
                         lbSpicesRequesting.Items.Remove(lbSpicesRequesting.Items[0]);
@@ -152,6 +161,10 @@ namespace formApp
                 }
             }
         }
-        
+
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            updateListBoxes();
+        }
     }
 }
