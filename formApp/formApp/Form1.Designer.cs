@@ -31,20 +31,21 @@
             this.components = new System.ComponentModel.Container();
             this.gb1 = new System.Windows.Forms.GroupBox();
             this.lbSpicesStored = new System.Windows.Forms.ListBox();
+            this.btnReq = new System.Windows.Forms.Button();
             this.gb2 = new System.Windows.Forms.GroupBox();
             this.lbSpicesLent = new System.Windows.Forms.ListBox();
-            this.btnReq = new System.Windows.Forms.Button();
             this.btnRet = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.lbSpicesReturning = new System.Windows.Forms.ListBox();
+            this.lbSpicesRequesting = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.lbSpicesRequesting = new System.Windows.Forms.ListBox();
-            this.lbSpicesReturning = new System.Windows.Forms.ListBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.btnConn = new System.Windows.Forms.Button();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.btnVoiceReq = new System.Windows.Forms.Button();
             this.gb1.SuspendLayout();
             this.gb2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -76,6 +77,16 @@
             this.lbSpicesStored.Size = new System.Drawing.Size(226, 254);
             this.lbSpicesStored.TabIndex = 1;
             // 
+            // btnReq
+            // 
+            this.btnReq.Location = new System.Drawing.Point(10, 300);
+            this.btnReq.Name = "btnReq";
+            this.btnReq.Size = new System.Drawing.Size(226, 42);
+            this.btnReq.TabIndex = 3;
+            this.btnReq.Text = "Request";
+            this.btnReq.UseVisualStyleBackColor = true;
+            this.btnReq.Click += new System.EventHandler(this.btnReq_Click);
+            // 
             // gb2
             // 
             this.gb2.Controls.Add(this.lbSpicesLent);
@@ -97,16 +108,6 @@
             this.lbSpicesLent.Name = "lbSpicesLent";
             this.lbSpicesLent.Size = new System.Drawing.Size(226, 254);
             this.lbSpicesLent.TabIndex = 2;
-            // 
-            // btnReq
-            // 
-            this.btnReq.Location = new System.Drawing.Point(10, 300);
-            this.btnReq.Name = "btnReq";
-            this.btnReq.Size = new System.Drawing.Size(226, 42);
-            this.btnReq.TabIndex = 3;
-            this.btnReq.Text = "Request";
-            this.btnReq.UseVisualStyleBackColor = true;
-            this.btnReq.Click += new System.EventHandler(this.btnReq_Click);
             // 
             // btnRet
             // 
@@ -144,6 +145,30 @@
             this.tabPage1.Text = "Request";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // lbSpicesReturning
+            // 
+            this.lbSpicesReturning.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbSpicesReturning.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lbSpicesReturning.FormattingEnabled = true;
+            this.lbSpicesReturning.ItemHeight = 25;
+            this.lbSpicesReturning.Location = new System.Drawing.Point(271, 196);
+            this.lbSpicesReturning.Name = "lbSpicesReturning";
+            this.lbSpicesReturning.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.lbSpicesReturning.Size = new System.Drawing.Size(256, 154);
+            this.lbSpicesReturning.TabIndex = 4;
+            // 
+            // lbSpicesRequesting
+            // 
+            this.lbSpicesRequesting.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbSpicesRequesting.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lbSpicesRequesting.FormattingEnabled = true;
+            this.lbSpicesRequesting.ItemHeight = 25;
+            this.lbSpicesRequesting.Location = new System.Drawing.Point(271, 24);
+            this.lbSpicesRequesting.Name = "lbSpicesRequesting";
+            this.lbSpicesRequesting.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.lbSpicesRequesting.Size = new System.Drawing.Size(256, 154);
+            this.lbSpicesRequesting.TabIndex = 3;
+            // 
             // tabPage2
             // 
             this.tabPage2.Location = new System.Drawing.Point(8, 39);
@@ -165,39 +190,6 @@
             this.tabPage3.Text = "COM";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
-            // lbSpicesRequesting
-            // 
-            this.lbSpicesRequesting.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.lbSpicesRequesting.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.lbSpicesRequesting.FormattingEnabled = true;
-            this.lbSpicesRequesting.ItemHeight = 25;
-            this.lbSpicesRequesting.Location = new System.Drawing.Point(271, 24);
-            this.lbSpicesRequesting.Name = "lbSpicesRequesting";
-            this.lbSpicesRequesting.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.lbSpicesRequesting.Size = new System.Drawing.Size(256, 154);
-            this.lbSpicesRequesting.TabIndex = 3;
-            // 
-            // lbSpicesReturning
-            // 
-            this.lbSpicesReturning.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.lbSpicesReturning.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.lbSpicesReturning.FormattingEnabled = true;
-            this.lbSpicesReturning.ItemHeight = 25;
-            this.lbSpicesReturning.Location = new System.Drawing.Point(271, 196);
-            this.lbSpicesReturning.Name = "lbSpicesReturning";
-            this.lbSpicesReturning.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.lbSpicesReturning.Size = new System.Drawing.Size(256, 154);
-            this.lbSpicesReturning.TabIndex = 4;
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(25, 24);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(549, 33);
-            this.comboBox1.TabIndex = 0;
-            this.comboBox1.DropDown += new System.EventHandler(this.comboBox1_DropDown);
-            // 
             // btnConn
             // 
             this.btnConn.Location = new System.Drawing.Point(590, 24);
@@ -208,6 +200,15 @@
             this.btnConn.UseVisualStyleBackColor = true;
             this.btnConn.Click += new System.EventHandler(this.btnConn_Click);
             // 
+            // comboBox1
+            // 
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(25, 24);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(549, 33);
+            this.comboBox1.TabIndex = 0;
+            this.comboBox1.DropDown += new System.EventHandler(this.comboBox1_DropDown);
+            // 
             // serialPort1
             // 
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
@@ -216,11 +217,22 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // btnVoiceReq
+            // 
+            this.btnVoiceReq.Location = new System.Drawing.Point(574, 4);
+            this.btnVoiceReq.Name = "btnVoiceReq";
+            this.btnVoiceReq.Size = new System.Drawing.Size(230, 42);
+            this.btnVoiceReq.TabIndex = 5;
+            this.btnVoiceReq.Text = "Voice Request";
+            this.btnVoiceReq.UseVisualStyleBackColor = true;
+            this.btnVoiceReq.Click += new System.EventHandler(this.btnVoiceReq_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(835, 444);
+            this.Controls.Add(this.btnVoiceReq);
             this.Controls.Add(this.tabControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "Form1";
@@ -253,6 +265,7 @@
         private System.Windows.Forms.ComboBox comboBox1;
         private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Button btnVoiceReq;
     }
 }
 

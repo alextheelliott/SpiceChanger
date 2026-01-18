@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Speech.Recognition;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,12 @@ namespace formApp
         private Dictionary<string,int> _spicesRequesting;
         private Dictionary<string,int> _spicesLent;
         private Dictionary<string,int> _spicesReturning;
+
+        public enum Commands
+        {
+            Request,
+            Return
+        }
 
         private SpiceManager() 
         {
@@ -125,6 +132,16 @@ namespace formApp
                 _spicesStored.Add(LentSpice,_spicesReturning[LentSpice]);
                 _spicesReturning.Remove(LentSpice);
             }
+        }
+
+        public Grammar BuildGrammer()
+        {
+            string[] keywords = _spicesStored.Keys.ToArray();
+            Choices choices = new Choices(keywords);
+            GrammarBuilder gb = new GrammarBuilder();
+            gb.Append(choices);
+
+            return new Grammar(gb);
         }
 
     }

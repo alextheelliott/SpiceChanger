@@ -5,12 +5,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Security.Cryptography;
+using System.Speech.Recognition;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.AxHost;
 
 namespace formApp
 {
@@ -18,6 +17,9 @@ namespace formApp
     {
         SpiceManager spiceManager;
         private ConcurrentQueue<Int32> dataQueue;
+
+        private SpeechRecognitionEngine recognizer = new SpeechRecognitionEngine();
+        private CancellationTokenSource voiceTimeout;
 
         public Form1()
         {
@@ -31,6 +33,92 @@ namespace formApp
         private void Form1_Load(object sender, EventArgs e)
         {
             timer1.Start();
+
+            recognizer.SetInputToDefaultAudioDevice();
+            recognizer.UnloadAllGrammars();
+            recognizer.LoadGrammar(spiceManager.BuildGrammer());
+            recognizer.SpeechRecognized += handleSpeechRecognized;
+        }
+
+        private void handleSpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            if (lbSpicesStored.FindStringExact(e.Result.Text) != ListBox.NoMatches)
+            {
+                resetTimeout();
+                object spice = lbSpicesStored.Items[lbSpicesStored.FindStringExact(e.Result.Text)];
+                requestSpice(spice);
+            }
+        }
+
+        private void btnVoiceReq_Click(object sender, EventArgs e)
+        {
+            //if (!listening) // START listening
+            //{
+            //    listening = true;
+            //    btnVoiceReq.Text = "Stop Listening";
+
+            //    recognizer.RecognizeAsync(RecognizeMode.Multiple);
+            //}
+            //else // STOP listening
+            //{
+            //    listening = false;
+            //    btnVoiceReq.Text = "Voice Request";
+
+            //    recognizer.RecognizeAsyncStop();
+            //}
+            Console.WriteLine("STARTING");
+            recognizer.RecognizeAsync(RecognizeMode.Multiple);
+            resetTimeout();
+        }
+
+        private async void resetTimeout()
+        {
+            voiceTimeout?.Cancel();
+            voiceTimeout = new CancellationTokenSource();
+            var token = voiceTimeout.Token;
+
+            try
+            {
+                await Task.Delay(4000, token); // 4 seconds from LAST speech
+                voiceTimeout?.Cancel();
+                recognizer.RecognizeAsyncStop();
+            }
+            catch (TaskCanceledException) { }
+            // expected when speech happens again
+        }
+
+        private void requestSpice(object spice)
+        {
+            int index = spiceManager.RequestSpice(spice.ToString());
+            sendPacket(SpiceManager.Commands.Request, index);
+
+            lbSpicesRequesting.Items.Add(spice);
+            lbSpicesStored.Items.Remove(spice);
+        }
+
+        private void confirmRequestSpice(object spice)
+        {
+            spiceManager.ConfirmRequestSpice(spice.ToString());
+                        
+            lbSpicesLent.Items.Add(spice);
+            lbSpicesRequesting.Items.Remove(spice);
+        }
+
+        private void returnSpice(object spice)
+        {
+            int index = spiceManager.ReturnSpice(spice.ToString());
+            sendPacket(SpiceManager.Commands.Return, index);
+
+            lbSpicesReturning.Items.Add(spice);
+            lbSpicesLent.Items.Remove(spice);
+        }
+
+        private void confirmReturnSpice(object spice)
+        {
+            spiceManager.ConfirmReturnSpice(spice.ToString());
+                        
+            lbSpicesStored.Items.Add(spice);
+            lbSpicesReturning.Items.Remove(spice);
         }
 
         private void btnReq_Click(object sender, EventArgs e)
@@ -38,12 +126,7 @@ namespace formApp
             if (lbSpicesStored.SelectedItem == null)
             { MessageBox.Show("Must first select a spice to request!","Error!"); return; }
 
-            int index = spiceManager.RequestSpice(lbSpicesStored.SelectedItem.ToString());
-            Console.WriteLine(index.ToString());
-            sendPacket(0, index);
-
-            lbSpicesRequesting.Items.Add(lbSpicesStored.SelectedItem);
-            lbSpicesStored.Items.Remove(lbSpicesStored.SelectedItem);
+            requestSpice(lbSpicesStored.SelectedItem);
         }
 
         private void btnRet_Click(object sender, EventArgs e)
@@ -51,12 +134,7 @@ namespace formApp
             if (lbSpicesLent.SelectedItem == null)
             { MessageBox.Show("Must first select a spice to return!","Error!"); return; }
 
-            int index = spiceManager.ReturnSpice(lbSpicesLent.SelectedItem.ToString());
-            Console.WriteLine(index.ToString());
-            sendPacket(1, index);
-            
-            lbSpicesReturning.Items.Add(lbSpicesLent.SelectedItem);
-            lbSpicesLent.Items.Remove(lbSpicesLent.SelectedItem);
+            returnSpice(lbSpicesLent.SelectedItem);
         }
 
         private void updateListBoxes()
@@ -110,7 +188,7 @@ namespace formApp
             }
         }
 
-        private void sendPacket(int command, int index)
+        private void sendPacket(SpiceManager.Commands command, int index)
         {
             byte[] bytes = new byte[3];
             bytes[0] = 255;
@@ -146,17 +224,11 @@ namespace formApp
                     startCount--;
                     if (item == 0)
                     {
-                        spiceManager.ConfirmRequestSpice(lbSpicesRequesting.Items[0].ToString());
-                        
-                        lbSpicesLent.Items.Add(lbSpicesRequesting.Items[0]);
-                        lbSpicesRequesting.Items.Remove(lbSpicesRequesting.Items[0]);
+                        confirmRequestSpice(lbSpicesRequesting.Items[0]);
                     }
                     else if (item == 1)
                     {
-                        spiceManager.ConfirmReturnSpice(lbSpicesReturning.Items[0].ToString());
-                        
-                        lbSpicesStored.Items.Add(lbSpicesReturning.Items[0]);
-                        lbSpicesReturning.Items.Remove(lbSpicesReturning.Items[0]);
+                        confirmReturnSpice(lbSpicesReturning.Items[0]);
                     }
                 }
             }
@@ -166,5 +238,6 @@ namespace formApp
         {
             updateListBoxes();
         }
+
     }
 }
