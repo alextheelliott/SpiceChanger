@@ -12,8 +12,10 @@
 
 #define BUFFER_SIZE 50
 #define START_BYTE 255
-#define DC_DEADBAND 50
-#define TICKS_PER_INDEX 306
+#define DC_DEADBAND 5
+#define DC_SATURATION 40
+#define DC_KP 4
+#define TICKS_PER_INDEX 76.5
 #define PUSHER_STEPS 294
 
 // ====================================================================== Structs
@@ -68,10 +70,10 @@ void uartTransmit(int byte) {
 }
 
 void setMotorSpeedDirection(int value) {
-    if (value > 100) {
-        value = 100;
-    } else if (value < -100) {
-        value = -100;
+    if (value > DC_SATURATION) {
+        value = DC_SATURATION;
+    } else if (value < DC_SATURATION * -1) {
+        value = DC_SATURATION * -1;
     }
     
     // Speed
@@ -276,7 +278,7 @@ void stateMachine(void) {
             break;
         // -------------------------------------------------------------- Give Spice
         case 11: // Give Spice - Step 1 - Rotate to correct index
-            desTicks = TICKS_PER_INDEX * activeIndex; // TODO replace with real values
+            desTicks = (long) TICKS_PER_INDEX * activeIndex;
             state = 12;
             break;
         case 12: // Give Spice - Step 2 - Wait until index matches (encoder ticks is correct)
@@ -376,7 +378,7 @@ __interrupt void TIMER1_B1_ISR(void) {
             TA0R = 0;
             TA1R = 0;
 
-            setMotorSpeedDirection(4 * (desTicks - encTicks)); // todo replace Kp
+            setMotorSpeedDirection(DC_KP * (desTicks - encTicks)); // todo replace Kp
 
             TB1CCR1 += 5000 - 1;
             break;
