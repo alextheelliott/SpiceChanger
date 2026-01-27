@@ -13,9 +13,10 @@
 #define BUFFER_SIZE 50
 #define START_BYTE 255
 #define DC_DEADBAND 5
-#define DC_SATURATION 40
-#define DC_KP 4
-#define TICKS_PER_INDEX 76.5
+#define DC_SATURATION 70
+#define DC_KP 1
+//#define TICKS_PER_INDEX 76.5
+#define TICKS_PER_INDEX 71.617
 #define PUSHER_STEPS 294
 
 // ====================================================================== Structs
