@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "firmware",
+            "type": "ccs-debug",
+            "request": "launch",
+            "projectInfo": {
+                "name": "firmware",
+                "resourceId": "/firmware"
+            }
+        }
+    ]
+}

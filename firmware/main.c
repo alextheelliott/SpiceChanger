@@ -14,7 +14,7 @@
 #define START_BYTE 255
 #define DC_DEADBAND 5
 #define DC_SATURATION 70
-#define DC_KP 1
+#define DC_KP 10125 //0.309 * 32768
 //#define TICKS_PER_INDEX 76.5
 #define TICKS_PER_INDEX 71.617
 #define PUSHER_STEPS 294
@@ -31,8 +31,11 @@ typedef struct {
 // ====================================================================== Global Variables
 
 volatile Buffer rxBuffer = {{}, 0, 0, 0};
+volatile Buffer txBuffer = {{}, 0, 0, 0};
 volatile Buffer taskBuffer = {{}, 0, 0, 0};
 
+
+volatile int started = 0;
 volatile int state = 0;
 volatile unsigned char activeIndex = 0;
 
@@ -47,9 +50,21 @@ volatile unsigned int stepsRem = 0;
 volatile signed int stepperState = 0;
 volatile signed int stepperDir = 0;
 
+/* Q11 gains */
+const int16_t x = (int32_t)  2417;
+const int16_t x1 = (int32_t) 1899;
+const int16_t y1 = (int32_t) -1875;
+volatile int16_t control_cmd = 0;
+volatile int32_t prev_input = 0;
+volatile int32_t prev_output = 0;
+volatile int32_t prevprev_input = 0;
+volatile int32_t prevprev_output = 0;
+
+
 // ====================================================================== Prototypes
 
 void uartTransmit(int byte);
+void uartQueueTransmit(int byte);
 
 void setMotorSpeedDirection(int value); // DC Motor
 
@@ -63,11 +78,52 @@ void init();
 void processPacket(void);
 void stateMachine(void);
 
+static inline int mpy_q15(int32_t a, int32_t b);
+static inline int16_t pid_compute(int32_t error);
+
 // ====================================================================== Methods
+
+
+static inline int mpy_q15(int32_t a, int32_t b)
+{
+    uint64_t result;
+
+    MPYS32L = a & 0xFFFF; // 1st operand lower word
+    MPYS32H = a >> 16; // 1st operand higher word
+    OP2L = b & 0xFFFF;    // 2nd operand lower word
+    OP2H = b >> 16;
+    result = (int64_t)RES3 << 48 | (int64_t)RES2 << 32 | (int64_t)RES1 << 16 | (int64_t)RES0;
+    return result >> 11;      // 64-bit result, dividing by 32768
+}
+
+static inline int16_t pid_compute(int32_t error) {
+    int32_t output;
+    signed int x_term;
+    signed int x1_term;
+    signed int y1_term;
+    
+    x_term = mpy_q15(x, error) ;
+    x1_term = mpy_q15(x1,  prev_input);
+    y1_term = mpy_q15(y1, prev_output);
+
+    /* ----- Sum ----- */
+    output = x_term + x1_term + y1_term;
+
+    prevprev_input = prev_input;
+    prev_input = error;
+    prevprev_output = prev_output;
+    prev_output = output;
+
+    return output;
+}
 
 void uartTransmit(int byte) {
     while (!(UCA1IFG & UCTXIFG));         // Wait for TX buffer to be ready
     UCA1TXBUF = byte;                     // Send data
+}
+
+void uartQueueTransmit(int byte) {
+    bufferPush(&txBuffer, byte);
 }
 
 void setMotorSpeedDirection(int value) {
@@ -214,12 +270,11 @@ void init(void) {
     // set PJ.0-3 to outputs for the offboard motor driver
     PJDIR |= BIT0 | BIT1 | BIT2 | BIT3;
 
-    //TB1CTL = TBSSEL__SMCLK | ID__8 | MC__STOP | TBCLR; 
-    TB1CTL = TBSSEL__SMCLK | ID__8 | MC__CONTINOUS | TBCLR; 
+    TB1CTL = TBSSEL__SMCLK | ID__8 | MC__STOP | TBCLR; 
     TB1CCTL1 = CCIE; 
     TB1CCTL2 = CCIE; 
-    TB1CCR1 = 5000 - 1; // 200 Hz, Encoder Update
-    TB1CCR2 = 5000 - 1;  // 2 kHz, Stepper Step Rate
+    TB1CCR1 = 500 - 1; // 200 Hz, Encoder Update
+    TB1CCR2 = 500 - 1;  // 2 kHz, Stepper Step Rate
 
     // ------------------------------------------------------------------ UART1
 
@@ -349,7 +404,13 @@ void main (void) {
             processPacket();  // Process incoming packet
         }
 
+        if (txBuffer.count > 0) {
+            // If TX buffer is ready, send data
+            if (UCA1IFG & UCTXIFG) UCA1TXBUF = bufferPop(&txBuffer); 
+        }
+
         stateMachine();
+        if (state == 12 || state == 16) {__delay_cycles(1000000);} // a short delay before the arm retracts
     }
 }
 
@@ -379,7 +440,12 @@ __interrupt void TIMER1_B1_ISR(void) {
             TA0R = 0;
             TA1R = 0;
 
-            setMotorSpeedDirection(DC_KP * (desTicks - encTicks)); // todo replace Kp
+            __disable_interrupt();
+            //control_cmd = mpy_q15(DC_KP,(desTicks - encTicks));
+            control_cmd = pid_compute((desTicks - encTicks));
+            __enable_interrupt();
+        
+            setMotorSpeedDirection(control_cmd);    
 
             TB1CCR1 += 5000 - 1;
             break;
@@ -398,6 +464,11 @@ __interrupt void TIMER1_B1_ISR(void) {
 
 #pragma vector = USCI_A1_VECTOR
 __interrupt void USCI_A1_ISR(void) {
+    if (started == 0) {
+        started = 1;
+        TB1CTL = TBSSEL__SMCLK | ID__8 | MC__CONTINOUS | TBCLR; 
+    }
+
     unsigned char RxByte = 0;
     RxByte = UCA1RXBUF; // Get the new byte from the Rx buffer
     bufferPush(&rxBuffer, RxByte);
