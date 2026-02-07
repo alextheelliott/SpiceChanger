@@ -12,7 +12,7 @@
 
 #define BUFFER_SIZE 50
 #define START_BYTE 255
-#define DC_DEADBAND 5
+#define DC_DEADBAND 10
 #define DC_SATURATION 70
 #define DC_KP 10125 //0.309 * 32768
 //#define TICKS_PER_INDEX 76.5
@@ -51,8 +51,8 @@ volatile signed int stepperState = 0;
 volatile signed int stepperDir = 0;
 
 /* Q11 gains */
-const int16_t x = (int32_t)  2417;
-const int16_t x1 = (int32_t) 1899;
+const int16_t x = (int32_t)  2420;
+const int16_t x1 = (int32_t) 1900;
 const int16_t y1 = (int32_t) -1875;
 volatile int16_t control_cmd = 0;
 volatile int32_t prev_input = 0;
@@ -237,6 +237,19 @@ void init(void) {
     P1IFG &= ~BIT3;
     P1IE |= BIT3;
 
+    // Limit Switch
+    // Configure P2.4 to P2.3 as circuit
+
+    P2DIR |= BIT4;
+    P2OUT |= BIT4;
+
+    P2DIR &= ~BIT3;      // Set P2.3 as Input
+    P2REN |= BIT3;       // Enable internal resistor
+    P2OUT &= ~BIT3;       // Set as Pull-Up (Pin is HIGH when circuit opens)
+
+    P2IES &= ~BIT3;      // Low-to-High transition (Trigger when circuit OPENS)
+    P2IFG &= ~BIT3;      // Clear flag
+    P2IE  |= BIT3;       // Enable P2.3 interrupt
     // ------------------------------------------------------------------ Timer A
 
     // Encoder B setup
@@ -273,8 +286,8 @@ void init(void) {
     TB1CTL = TBSSEL__SMCLK | ID__8 | MC__STOP | TBCLR; 
     TB1CCTL1 = CCIE; 
     TB1CCTL2 = CCIE; 
-    TB1CCR1 = 500 - 1; // 200 Hz, Encoder Update
-    TB1CCR2 = 500 - 1;  // 2 kHz, Stepper Step Rate
+    TB1CCR1 = 5000 - 1; // 200 Hz, Encoder Update
+    TB1CCR2 = 5000 - 1;  // 2 kHz, Stepper Step Rate
 
     // ------------------------------------------------------------------ UART1
 
@@ -341,6 +354,7 @@ void stateMachine(void) {
             if (abs(desTicks - encTicks) < DC_DEADBAND) { state = 13; }
             break;
         case 13: // Give Spice - Step 3 - Extend the pusher arm
+            __delay_cycles(1000000);
             stepperDir = 1;
             stepsRem = PUSHER_STEPS;
             state = 14;
@@ -352,6 +366,7 @@ void stateMachine(void) {
             if (!spiceSeen) { state = 16; uartTransmit(0x01); }
             break;
         case 16: // Give Spice - Step 6 - Retract the pusher arm
+            __delay_cycles(1000000);
             stepperDir = -1;
             stepsRem = PUSHER_STEPS;
             state = 17;
@@ -410,7 +425,7 @@ void main (void) {
         }
 
         stateMachine();
-        if (state == 12 || state == 16) {__delay_cycles(1000000);} // a short delay before the arm retracts
+        //if (state == 13 || state == 17) {__delay_cycles(1000000);} // a short delay before the arm retracts
     }
 }
 
@@ -428,7 +443,22 @@ __interrupt void Port_1_ISR(void) {
         }
 
         // Clear flag
-        P1IFG &= ~BIT3;
+        P1IFG &= ~BIT7;
+    }
+}
+
+#pragma vector=PORT2_VECTOR
+__interrupt void Port_2_ISR(void) {
+    if (P2IFG & BIT3) {
+
+        __delay_cycles(20000);
+
+        if (P2IN & BIT3) {
+            uartTransmit(23);
+        } 
+
+        // Clear flag
+        P2IFG &= ~BIT3;
     }
 }
 
