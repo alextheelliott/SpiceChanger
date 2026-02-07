@@ -6,7 +6,11 @@ def createBackend() -> Flask:
     app = Flask(__name__)
     com = None
 
-    @app.route('/connect', methods=['POST'])
+    @app.route('/com/get_ports', methods=['GET'])
+    def getCOMPorts():
+        pass # TODO: implement
+
+    @app.route('/com/connect', methods=['POST'])
     def connectToCOM():
         payload = request.get_json()
         print(payload)
@@ -27,9 +31,11 @@ def createBackend() -> Flask:
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    # todo add disconnect from com port
+    @app.route('/com/disconnect', methods=['POST'])
+    def disconnectFromCOM():
+        pass # TODO: implement
 
-    @app.route('/write', methods=['POST'])
+    @app.route('/com/write', methods=['POST'])
     def writeToCOM():
         payload = request.get_json()
         bytes = payload.get('data') # or whatever key you prefer
@@ -40,6 +46,18 @@ def createBackend() -> Flask:
         except Exception as e:
             return jsonify({"error": str(e)}), 500
         
+    @app.route('/util/get_spices', methods=['GET'])
+    def getSpices():
+        pass # TODO: implement
+
+    @app.route('/voice/init', methods=['POST'])
+    def initVoiceRecog():
+        pass # TODO: implement
+
+    @app.route('/voice/listen', methods=['GET'])
+    def startListening():
+        pass # TODO: implement
+
     return app
 
 if __name__ == '__main__':
