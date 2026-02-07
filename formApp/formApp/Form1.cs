@@ -90,7 +90,7 @@ namespace formApp
         private void requestSpice(object spice)
         {
             int index = spiceManager.RequestSpice(spice.ToString());
-            sendPacket(SpiceManager.Commands.Request, index);
+            //sendPacket(SpiceManager.Commands.Request, index);
 
             lbSpicesRequesting.Items.Add(spice);
             lbSpicesStored.Items.Remove(spice);
@@ -107,7 +107,7 @@ namespace formApp
         private void returnSpice(object spice)
         {
             int index = spiceManager.ReturnSpice(spice.ToString());
-            sendPacket(SpiceManager.Commands.Return, index);
+            //sendPacket(SpiceManager.Commands.Return, index);
 
             lbSpicesReturning.Items.Add(spice);
             lbSpicesLent.Items.Remove(spice);
