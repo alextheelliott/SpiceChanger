@@ -37,7 +37,7 @@ volatile Buffer taskBuffer = {{}, 0, 0, 0};
 
 volatile int started = 0;
 volatile int state = 0;
-volatile unsigned char activeIndex = 0;
+volatile signed int activeIndex = 0;
 
 volatile bool spiceSeen = false;
 volatile bool zerodTray = false;
@@ -318,7 +318,7 @@ void processPacket(void) {
         int commandByte = bufferPop(&rxBuffer); // Command
         int index = bufferPop(&rxBuffer);   // Index
 
-        uartTransmit(0x00);
+        //uartTransmit(0x00);
 
         switch(commandByte)
         {
@@ -340,11 +340,24 @@ void stateMachine(void) {
             if (taskBuffer.count > 0) {
                 int task = bufferPop(&taskBuffer);
                 int receivedIndex = task >> 2;
-    
+
                 if (receivedIndex == 9) { state = 1;}
                 else { 
                     state = ((task & 0b11) == 0x00) ? 11 : 21;
-                    activeIndex = receivedIndex;
+
+                    int currentPos = activeIndex;
+                    int targetPos = receivedIndex;
+
+                    int diff = targetPos - currentPos;
+
+                    // Shortest path wrap-around logic
+                    if (diff > 4)  diff -= 8;
+                    else if (diff < -4) diff += 8;
+
+                    uartTransmit(diff);
+
+                    activeIndex = diff;
+                    //activeIndex = receivedIndex;
                 }
             }
             break;
@@ -365,20 +378,27 @@ void stateMachine(void) {
             zerodTray = false;
             desTicks = 0;
             encTicks = 0;
+            activeIndex = 0;
             dc_saturation = DEFAULT_SATURATION;
             uartTransmit(1);
             state = 0;
             break;
         // -------------------------------------------------------------- Give Spice
         case 11: // Give Spice - Step 1 - Rotate to correct index
-            desTicks = (long) TICKS_PER_INDEX * activeIndex;
+            desTicks = encTicks + (long) TICKS_PER_INDEX * activeIndex;
             state = 12;
             break;
         case 12: // Give Spice - Step 2 - Wait until index matches (encoder ticks is correct)
-            if (abs(desTicks - encTicks) < DC_DEADBAND) { state = 13; }
+            if (abs(desTicks - encTicks) < DC_DEADBAND) { 
+                // Normalize ticks so they are always 0 to (8 * TICKS_PER_INDEX)
+                encTicks = encTicks % ((int)TICKS_PER_INDEX * 8);
+                if (encTicks < 0) encTicks += (TICKS_PER_INDEX * 8); 
+                desTicks = encTicks; // Stay put
+                uartTransmit(0x01);
+                state = 13; }
             break;
         case 13: // Give Spice - Step 3 - Extend the pusher arm
-            __delay_cycles(1000000);
+            //__delay_cycles(1000000);
             stepperDir = 1;
             stepsRem = PUSHER_STEPS;
             state = 14;
@@ -399,7 +419,7 @@ void stateMachine(void) {
             if (stepsRem < 1) { state = 18; }
             break;
         case 18: // Give Spice - Step 8 - Continue onto next task
-            uartTransmit(0x01);
+            
             state = 0;
             break;
         // -------------------------------------------------------------- Return Spice
