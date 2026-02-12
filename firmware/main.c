@@ -13,7 +13,7 @@
 #define BUFFER_SIZE 50
 #define START_BYTE 255
 #define DC_DEADBAND 10
-#define DC_SATURATION 70
+#define DEFAULT_SATURATION 70
 #define DC_KP 10125 //0.309 * 32768
 //#define TICKS_PER_INDEX 76.5
 #define TICKS_PER_INDEX 71.617
@@ -49,6 +49,8 @@ volatile unsigned int PWM_25;
 volatile unsigned int stepsRem = 0;
 volatile signed int stepperState = 0;
 volatile signed int stepperDir = 0;
+
+volatile float dc_saturation = 40;
 
 /* Q11 gains */
 const int16_t x = (int32_t)  2420;
@@ -127,10 +129,10 @@ void uartQueueTransmit(int byte) {
 }
 
 void setMotorSpeedDirection(int value) {
-    if (value > DC_SATURATION) {
-        value = DC_SATURATION;
-    } else if (value < DC_SATURATION * -1) {
-        value = DC_SATURATION * -1;
+    if (value > dc_saturation) {
+        value = dc_saturation;
+    } else if (value < dc_saturation * -1) {
+        value = dc_saturation * -1;
     }
     
     // Speed
@@ -337,13 +339,35 @@ void stateMachine(void) {
         case 0: // Waiting for Task
             if (taskBuffer.count > 0) {
                 int task = bufferPop(&taskBuffer);
-                state = ((task & 0b11) == 0x00) ? 11 : 21;
-                activeIndex = task >> 2;
+                int receivedIndex = task >> 2;
+    
+                if (receivedIndex == 9) { state = 1;}
+                else { 
+                    state = ((task & 0b11) == 0x00) ? 11 : 21;
+                    activeIndex = receivedIndex;
+                }
             }
             break;
         // -------------------------------------------------------------- Utility States
         case 1: // Zero Tray (On startup)
-            if (zerodTray) { encTicks = 0; state = 0; }
+            zerodTray = false;
+            desTicks = (long) TICKS_PER_INDEX * 10;
+            dc_saturation = 40;
+            state = 2;
+            break;
+        case 2: // Zero Tray detected
+            if (zerodTray) { 
+                desTicks = (long) TICKS_PER_INDEX * 0.5;
+                state = 3;
+            }
+            break;
+        case 3: // Zero Tray complete
+            zerodTray = false;
+            desTicks = 0;
+            encTicks = 0;
+            dc_saturation = DEFAULT_SATURATION;
+            uartTransmit(1);
+            state = 0;
             break;
         // -------------------------------------------------------------- Give Spice
         case 11: // Give Spice - Step 1 - Rotate to correct index
@@ -363,10 +387,10 @@ void stateMachine(void) {
             if (stepsRem < 1) { state = 15; }
             break;
         case 15: // Give Spice - Step 5 - Wait until the user TAKES the container (IR sensor)
-            if (!spiceSeen) { state = 16; uartTransmit(0x01); }
+            if (!spiceSeen) { state = 16; }
             break;
         case 16: // Give Spice - Step 6 - Retract the pusher arm
-            __delay_cycles(1000000);
+            //__delay_cycles(1000000);
             stepperDir = -1;
             stepsRem = PUSHER_STEPS;
             state = 17;
@@ -375,6 +399,7 @@ void stateMachine(void) {
             if (stepsRem < 1) { state = 18; }
             break;
         case 18: // Give Spice - Step 8 - Continue onto next task
+            uartTransmit(0x01);
             state = 0;
             break;
         // -------------------------------------------------------------- Return Spice
@@ -451,10 +476,9 @@ __interrupt void Port_1_ISR(void) {
 __interrupt void Port_2_ISR(void) {
     if (P2IFG & BIT3) {
 
-        __delay_cycles(20000);
-
         if (P2IN & BIT3) {
-            uartTransmit(23);
+            //uartTransmit(23);
+            zerodTray = true;
         } 
 
         // Clear flag
@@ -471,8 +495,8 @@ __interrupt void TIMER1_B1_ISR(void) {
             TA1R = 0;
 
             __disable_interrupt();
-            //control_cmd = mpy_q15(DC_KP,(desTicks - encTicks));
-            control_cmd = pid_compute((desTicks - encTicks));
+            control_cmd = mpy_q15(DC_KP,(desTicks - encTicks));
+            //control_cmd = pid_compute((desTicks - encTicks));
             __enable_interrupt();
         
             setMotorSpeedDirection(control_cmd);    
