@@ -12,11 +12,11 @@
 
 #define BUFFER_SIZE 50
 #define START_BYTE 255
-#define DC_DEADBAND 10
-#define DEFAULT_SATURATION 70
+#define DC_DEADBAND 5
+#define DEFAULT_SATURATION 55
 #define DC_KP 10125 //0.309 * 32768
 //#define TICKS_PER_INDEX 76.5
-#define TICKS_PER_INDEX 71.617
+#define TICKS_PER_INDEX 71.612
 #define PUSHER_STEPS 294
 
 // ====================================================================== Structs
@@ -38,6 +38,7 @@ volatile Buffer taskBuffer = {{}, 0, 0, 0};
 volatile int started = 0;
 volatile int state = 0;
 volatile signed int activeIndex = 0;
+volatile int diff = 0;
 
 volatile bool spiceSeen = false;
 volatile bool zerodTray = false;
@@ -50,12 +51,12 @@ volatile unsigned int stepsRem = 0;
 volatile signed int stepperState = 0;
 volatile signed int stepperDir = 0;
 
-volatile float dc_saturation = 40;
+volatile float dc_saturation = DEFAULT_SATURATION;
 
 /* Q11 gains */
-const int16_t x = (int32_t)  2420;
-const int16_t x1 = (int32_t) 1900;
-const int16_t y1 = (int32_t) -1875;
+const int16_t x = (int32_t)  2900;
+const int16_t x1 = (int32_t) 2200;
+const int16_t y1 = (int32_t) -1900;
 volatile int16_t control_cmd = 0;
 volatile int32_t prev_input = 0;
 volatile int32_t prev_output = 0;
@@ -318,7 +319,7 @@ void processPacket(void) {
         int commandByte = bufferPop(&rxBuffer); // Command
         int index = bufferPop(&rxBuffer);   // Index
 
-        //uartTransmit(0x00);
+        //uartQueueTransmit(0x00);
 
         switch(commandByte)
         {
@@ -334,6 +335,7 @@ void processPacket(void) {
 }
 
 void stateMachine(void) {
+    
     switch (state) {
         // -------------------------------------------------------------- Default State - Waiting
         case 0: // Waiting for Task
@@ -345,32 +347,27 @@ void stateMachine(void) {
                 else { 
                     state = ((task & 0b11) == 0x00) ? 11 : 21;
 
-                    int currentPos = activeIndex;
-                    int targetPos = receivedIndex;
-
-                    int diff = targetPos - currentPos;
+                    diff = receivedIndex - activeIndex; // check the difference in indexes for the tray to move
+                    activeIndex = receivedIndex; // update the active index
 
                     // Shortest path wrap-around logic
                     if (diff > 4)  diff -= 8;
                     else if (diff < -4) diff += 8;
 
-                    uartTransmit(diff);
-
-                    activeIndex = diff;
-                    //activeIndex = receivedIndex;
+                    
                 }
             }
             break;
         // -------------------------------------------------------------- Utility States
         case 1: // Zero Tray (On startup)
             zerodTray = false;
-            desTicks = (long) TICKS_PER_INDEX * 10;
-            dc_saturation = 40;
+            desTicks = -(long) TICKS_PER_INDEX * 10;
+            dc_saturation = 50;
             state = 2;
             break;
         case 2: // Zero Tray detected
             if (zerodTray) { 
-                desTicks = (long) TICKS_PER_INDEX * 0.5;
+                desTicks = -(long) TICKS_PER_INDEX;
                 state = 3;
             }
             break;
@@ -385,16 +382,20 @@ void stateMachine(void) {
             break;
         // -------------------------------------------------------------- Give Spice
         case 11: // Give Spice - Step 1 - Rotate to correct index
-            desTicks = encTicks + (long) TICKS_PER_INDEX * activeIndex;
+            desTicks = encTicks + (long) TICKS_PER_INDEX * diff;
             state = 12;
             break;
         case 12: // Give Spice - Step 2 - Wait until index matches (encoder ticks is correct)
             if (abs(desTicks - encTicks) < DC_DEADBAND) { 
+
+                /*
                 // Normalize ticks so they are always 0 to (8 * TICKS_PER_INDEX)
                 encTicks = encTicks % ((int)TICKS_PER_INDEX * 8);
                 if (encTicks < 0) encTicks += (TICKS_PER_INDEX * 8); 
+                */
+
                 desTicks = encTicks; // Stay put
-                uartTransmit(0x01);
+                uartQueueTransmit(0x01);
                 state = 13; }
             break;
         case 13: // Give Spice - Step 3 - Extend the pusher arm
@@ -424,25 +425,38 @@ void stateMachine(void) {
             break;
         // -------------------------------------------------------------- Return Spice
         case 21: // Return Spice - Step 1 - Rotate to correct index
+            desTicks = encTicks + (long) TICKS_PER_INDEX * diff;
+            state = 22;
+            break;
 
             break;
         case 22: // Return Spice - Step 2 - Wait until index matches (encoder ticks is correct)
+            if (abs(desTicks - encTicks) < DC_DEADBAND) { 
 
+                desTicks = encTicks; // Stay put
+                uartQueueTransmit(0x01);
+                state = 23; }
             break;
         case 23: // Return Spice - Step 3 - Extend the pusher arm
-        
+            //__delay_cycles(1000000);
+            stepperDir = 1;
+            stepsRem = PUSHER_STEPS;
+            state = 24;
             break;
         case 24: // Return Spice - Step 4 - Wait until arm is pushed (stepper steps is completed)
-        
+            if (stepsRem < 1) { state = 25; }
             break;
         case 25: // Return Spice - Step 5 - Wait until the user RETURNS the container (IR sensor)
-        
+            if (spiceSeen) { state = 26; }
             break;
         case 26: // Return Spice - Step 6 - Retract the pusher arm
-        
+            //__delay_cycles(1000000);
+            stepperDir = -1;
+            stepsRem = PUSHER_STEPS;
+            state = 27;
             break;
         case 27: // Return Spice - Step 7 - Wait until arm is ractracted (stepper steps is completed)
-        
+            if (stepsRem < 1) { state = 28; }
             break;
         case 28: // Return Spice - Step 8 - Continue onto next task
             state = 0;
@@ -497,7 +511,7 @@ __interrupt void Port_2_ISR(void) {
     if (P2IFG & BIT3) {
 
         if (P2IN & BIT3) {
-            //uartTransmit(23);
+            //uartQueueTransmit(23);
             zerodTray = true;
         } 
 
@@ -515,8 +529,8 @@ __interrupt void TIMER1_B1_ISR(void) {
             TA1R = 0;
 
             __disable_interrupt();
-            control_cmd = mpy_q15(DC_KP,(desTicks - encTicks));
-            //control_cmd = pid_compute((desTicks - encTicks));
+            //control_cmd = mpy_q15(DC_KP,(desTicks - encTicks));
+            control_cmd = pid_compute((desTicks - encTicks));
             __enable_interrupt();
         
             setMotorSpeedDirection(control_cmd);    
