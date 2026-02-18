@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Speech.Recognition;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace formApp
 {
-
     public sealed class SpiceManager
     {
         private static SpiceManager instance;
 
-        private Dictionary<string,int> _spicesStored;
-        private Dictionary<string,int> _spicesRequesting;
-        private Dictionary<string,int> _spicesLent;
-        private Dictionary<string,int> _spicesReturning;
+        private List<string> _spiceOptions;
+        private Dictionary<string,(string,int,SpiceState)> _spiceState;
+        private Dictionary<SpiceState,ListBox> _listBoxes;
 
         public enum Commands
         {
@@ -24,14 +20,47 @@ namespace formApp
             Return
         }
 
+        public enum SpiceState
+        {
+            Default,
+            Stored,
+            Lending,
+            Lent,
+            Storing,
+        }
+
+        public static string State2String(SpiceState state)
+        {
+            switch (state)
+            {
+                case SpiceState.Stored:  return "Stored";
+                case SpiceState.Lending: return "Lending";
+                case SpiceState.Lent:    return "Lent";
+                case SpiceState.Storing: return "Storing";
+                default: return "Default";
+            }
+        }
+
+        public static SpiceState String2State(string state)
+        {
+            switch (state)
+            {
+                case "Stored":  return SpiceState.Stored;
+                case "Lending": return SpiceState.Lending;
+                case "Lent":    return SpiceState.Lent;
+                case "Storing": return SpiceState.Storing;
+                default: return SpiceState.Default;
+            }
+        }
+
         private SpiceManager() 
         {
-            _spicesStored = new Dictionary<string,int>();
-            _spicesRequesting = new Dictionary<string,int>();
-            _spicesLent = new Dictionary<string,int>();
-            _spicesReturning = new Dictionary<string,int>();
-
-            LoadSpiceDict();
+            _spiceOptions = new List<string>();
+            _spiceState = new Dictionary<string,(string,int,SpiceState)>();
+            _listBoxes = new Dictionary<SpiceState, ListBox>();
+            
+            LoadSpiceOptions();
+            LoadSpiceState();
         }
 
         //Singleton getter
@@ -47,97 +76,111 @@ namespace formApp
             }
         }
 
-        private void LoadSpiceDict()
+        private void LoadSpiceOptions()
         {
-            using(StreamReader reader = new StreamReader("spiceDictionary.csv"))
+            using(StreamReader reader = new StreamReader("spiceOptions.csv"))
             {
+                while (!reader.EndOfStream)
+                {
+                    string line = reader.ReadLine();
+                
+                    _spiceOptions.Add(line);
+                }
+            }
+        }
+
+        private void LoadSpiceState()
+        {
+            using(StreamReader reader = new StreamReader("saveState.csv"))
+            {
+                string header = reader.ReadLine();
+
                 while (!reader.EndOfStream)
                 {
                     string line = reader.ReadLine();
                     string[] values = line.Split(',');
 
-                    _spicesStored.Add(values[0],int.Parse(values[1]));
+                    _spiceState.Add(
+                        values[0],
+                        (values[0], int.Parse(values[1]), String2State(values[2]))
+                    );
                 }
             }
         }
 
-        private void SaveSpiceDict()
+        private void SaveSpiceState()
         {
             using(StreamWriter writer = new StreamWriter("spiceDictionary.csv"))
             {
-                foreach (KeyValuePair<string, int> entry in _spicesStored)
+                foreach (KeyValuePair<string,(string,int,SpiceState)> entry in _spiceState)
                 {
-                    writer.WriteLine($"{entry.Key},{entry.Value}");
+                    (string name, int index, SpiceState state) = entry.Value;
+                    writer.WriteLine($"{name},{index},{State2String(state)}");
                 }
             }
         }
 
-        public Dictionary<string,int> SpicesStored
+        public Dictionary<string,(string,int,SpiceState)> State
         {
-            get { return new Dictionary<string,int>(_spicesStored); }
+            get { return new Dictionary<string,(string,int,SpiceState)>(_spiceState); }
         }
 
-        public Dictionary<string,int> SpicesRequesting
+        public void UpdateListBox(SpiceState state, ListBox listBox)
         {
-            get { return new Dictionary<string,int>(_spicesRequesting); }
+            _listBoxes[state] = listBox;
         }
 
-        public Dictionary<string,int> SpicesLent
+        public int UpdateState(string spice, SpiceState newState)
         {
-            get { return new Dictionary<string,int>(_spicesLent); }
-        }
-
-        public Dictionary<string,int> SpicesReturning
-        {
-            get { return new Dictionary<string,int>(_spicesReturning); }
-        }
-
-        public int RequestSpice(string RequestedSpice)
-        {
-            if (_spicesStored.ContainsKey(RequestedSpice))
+            if (_spiceState.ContainsKey(spice))
             {
-                _spicesRequesting.Add(RequestedSpice,_spicesStored[RequestedSpice]);
-                _spicesStored.Remove(RequestedSpice);
+                (_, int index, SpiceState oldState) = _spiceState[spice];
+                _spiceState[spice] = (spice,index,newState);
 
-                return _spicesRequesting[RequestedSpice];
+                if (_listBoxes.ContainsKey(oldState))
+                {
+                    int match = _listBoxes[oldState].FindStringExact(spice);
+                    if (match != ListBox.NoMatches)
+                    {
+                        _listBoxes[oldState].Items.RemoveAt(match);
+                    }
+                }
+
+                if (_listBoxes.ContainsKey(newState))
+                {
+                    int match = _listBoxes[newState].FindStringExact(spice);
+                    if (match == ListBox.NoMatches)
+                    {
+                        _listBoxes[newState].Items.Add(spice);
+                    }
+                }
+
+                return index;
             }
             return -1;
         }
 
-        public void ConfirmRequestSpice(string RequestedSpice)
+        public int AddSpice(string spice, int index, SpiceState state)
         {
-            if (_spicesRequesting.ContainsKey(RequestedSpice))
+            if (!_spiceState.ContainsKey(spice))
             {
-                _spicesLent.Add(RequestedSpice,_spicesRequesting[RequestedSpice]);
-                _spicesRequesting.Remove(RequestedSpice);
-            }
-        }
-
-        public int ReturnSpice(string LentSpice)
-        {
-            if (_spicesLent.ContainsKey(LentSpice))
-            {
-                _spicesReturning.Add(LentSpice, _spicesLent[LentSpice]);
-                _spicesLent.Remove(LentSpice);
-
-                return _spicesReturning[LentSpice];
+                _spiceState.Add(spice,(spice,index,state));
             }
             return -1;
         }
 
-        public void ConfirmReturnSpice(string LentSpice)
+        public int RemoveSpice(string spice)
         {
-            if (_spicesReturning.ContainsKey(LentSpice))
+            if (_spiceState.ContainsKey(spice))
             {
-                _spicesStored.Add(LentSpice,_spicesReturning[LentSpice]);
-                _spicesReturning.Remove(LentSpice);
+                _spiceState.Remove(spice);
             }
+            return -1;
         }
 
         public Grammar BuildGrammer()
         {
-            string[] keywords = _spicesStored.Keys.ToArray();
-            Choices choices = new Choices(keywords);
+            Choices choices = new Choices(_spiceOptions.ToArray());
             GrammarBuilder gb = new GrammarBuilder();
             gb.Append(choices);
 

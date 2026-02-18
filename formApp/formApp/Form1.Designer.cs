@@ -37,8 +37,8 @@
             this.btnRet = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.lbSpicesReturning = new System.Windows.Forms.ListBox();
-            this.lbSpicesRequesting = new System.Windows.Forms.ListBox();
+            this.lbSpicesStoring = new System.Windows.Forms.ListBox();
+            this.lbSpicesLending = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.btnConn = new System.Windows.Forms.Button();
@@ -133,8 +133,8 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.lbSpicesReturning);
-            this.tabPage1.Controls.Add(this.lbSpicesRequesting);
+            this.tabPage1.Controls.Add(this.lbSpicesStoring);
+            this.tabPage1.Controls.Add(this.lbSpicesLending);
             this.tabPage1.Controls.Add(this.gb1);
             this.tabPage1.Controls.Add(this.gb2);
             this.tabPage1.Location = new System.Drawing.Point(8, 39);
@@ -145,29 +145,29 @@
             this.tabPage1.Text = "Request";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // lbSpicesReturning
+            // lbSpicesStoring
             // 
-            this.lbSpicesReturning.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.lbSpicesReturning.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.lbSpicesReturning.FormattingEnabled = true;
-            this.lbSpicesReturning.ItemHeight = 25;
-            this.lbSpicesReturning.Location = new System.Drawing.Point(271, 196);
-            this.lbSpicesReturning.Name = "lbSpicesReturning";
-            this.lbSpicesReturning.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.lbSpicesReturning.Size = new System.Drawing.Size(256, 154);
-            this.lbSpicesReturning.TabIndex = 4;
+            this.lbSpicesStoring.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbSpicesStoring.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lbSpicesStoring.FormattingEnabled = true;
+            this.lbSpicesStoring.ItemHeight = 25;
+            this.lbSpicesStoring.Location = new System.Drawing.Point(271, 196);
+            this.lbSpicesStoring.Name = "lbSpicesStoring";
+            this.lbSpicesStoring.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.lbSpicesStoring.Size = new System.Drawing.Size(256, 154);
+            this.lbSpicesStoring.TabIndex = 4;
             // 
-            // lbSpicesRequesting
+            // lbSpicesLending
             // 
-            this.lbSpicesRequesting.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.lbSpicesRequesting.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.lbSpicesRequesting.FormattingEnabled = true;
-            this.lbSpicesRequesting.ItemHeight = 25;
-            this.lbSpicesRequesting.Location = new System.Drawing.Point(271, 24);
-            this.lbSpicesRequesting.Name = "lbSpicesRequesting";
-            this.lbSpicesRequesting.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.lbSpicesRequesting.Size = new System.Drawing.Size(256, 154);
-            this.lbSpicesRequesting.TabIndex = 3;
+            this.lbSpicesLending.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.lbSpicesLending.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lbSpicesLending.FormattingEnabled = true;
+            this.lbSpicesLending.ItemHeight = 25;
+            this.lbSpicesLending.Location = new System.Drawing.Point(271, 24);
+            this.lbSpicesLending.Name = "lbSpicesLending";
+            this.lbSpicesLending.SelectionMode = System.Windows.Forms.SelectionMode.None;
+            this.lbSpicesLending.Size = new System.Drawing.Size(256, 154);
+            this.lbSpicesLending.TabIndex = 3;
             // 
             // tabPage2
             // 
@@ -259,8 +259,8 @@
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.ListBox lbSpicesReturning;
-        private System.Windows.Forms.ListBox lbSpicesRequesting;
+        private System.Windows.Forms.ListBox lbSpicesStoring;
+        private System.Windows.Forms.ListBox lbSpicesLending;
         private System.Windows.Forms.Button btnConn;
         private System.Windows.Forms.ComboBox comboBox1;
         private System.IO.Ports.SerialPort serialPort1;

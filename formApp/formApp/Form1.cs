@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Speech.Recognition;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -28,6 +23,11 @@ namespace formApp
 
             InitializeComponent();
             updateListBoxes();
+            
+            spiceManager.UpdateListBox(SpiceManager.SpiceState.Stored,  lbSpicesStored);
+            spiceManager.UpdateListBox(SpiceManager.SpiceState.Lending, lbSpicesLending);
+            spiceManager.UpdateListBox(SpiceManager.SpiceState.Lent,    lbSpicesLent);
+            spiceManager.UpdateListBox(SpiceManager.SpiceState.Storing, lbSpicesStoring);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -52,20 +52,6 @@ namespace formApp
 
         private void btnVoiceReq_Click(object sender, EventArgs e)
         {
-            //if (!listening) // START listening
-            //{
-            //    listening = true;
-            //    btnVoiceReq.Text = "Stop Listening";
-
-            //    recognizer.RecognizeAsync(RecognizeMode.Multiple);
-            //}
-            //else // STOP listening
-            //{
-            //    listening = false;
-            //    btnVoiceReq.Text = "Voice Request";
-
-            //    recognizer.RecognizeAsyncStop();
-            //}
             Console.WriteLine("STARTING");
             recognizer.RecognizeAsync(RecognizeMode.Multiple);
             resetTimeout();
@@ -89,36 +75,14 @@ namespace formApp
 
         private void requestSpice(object spice)
         {
-            int index = spiceManager.RequestSpice(spice.ToString());
+            int index = spiceManager.UpdateState(spice.ToString(), SpiceManager.SpiceState.Lending);
             sendPacket(SpiceManager.Commands.Request, index);
-
-            lbSpicesRequesting.Items.Add(spice);
-            lbSpicesStored.Items.Remove(spice);
-        }
-
-        private void confirmRequestSpice(object spice)
-        {
-            spiceManager.ConfirmRequestSpice(spice.ToString());
-                        
-            lbSpicesLent.Items.Add(spice);
-            lbSpicesRequesting.Items.Remove(spice);
         }
 
         private void returnSpice(object spice)
         {
-            int index = spiceManager.ReturnSpice(spice.ToString());
+            int index = spiceManager.UpdateState(spice.ToString(), SpiceManager.SpiceState.Storing);
             sendPacket(SpiceManager.Commands.Return, index);
-
-            lbSpicesReturning.Items.Add(spice);
-            lbSpicesLent.Items.Remove(spice);
-        }
-
-        private void confirmReturnSpice(object spice)
-        {
-            spiceManager.ConfirmReturnSpice(spice.ToString());
-                        
-            lbSpicesStored.Items.Add(spice);
-            lbSpicesReturning.Items.Remove(spice);
         }
 
         private void btnReq_Click(object sender, EventArgs e)
@@ -140,20 +104,30 @@ namespace formApp
         private void updateListBoxes()
         {
             lbSpicesStored.Items.Clear();
-            foreach (KeyValuePair<string, int> entry in spiceManager.SpicesStored)
-            { lbSpicesStored.Items.Add($"{entry.Key}"); }
-
-            lbSpicesRequesting.Items.Clear();
-            foreach (KeyValuePair<string, int> entry in spiceManager.SpicesRequesting)
-            { lbSpicesRequesting.Items.Add($"{entry.Key}"); }
-
+            lbSpicesLending.Items.Clear();
             lbSpicesLent.Items.Clear();
-            foreach (KeyValuePair<string, int> entry in spiceManager.SpicesLent)
-            { lbSpicesLent.Items.Add($"{entry.Key}"); }
+            lbSpicesStoring.Items.Clear();
 
-            lbSpicesReturning.Items.Clear();
-            foreach (KeyValuePair<string, int> entry in spiceManager.SpicesReturning)
-            { lbSpicesReturning.Items.Add($"{entry.Key}"); }
+            foreach (KeyValuePair<string,(string,int,SpiceManager.SpiceState)> entry in spiceManager.State)
+            {
+                (string name, _, SpiceManager.SpiceState state) = entry.Value;
+
+                switch (state)
+                {
+                    case SpiceManager.SpiceState.Stored:
+                        lbSpicesStored.Items.Add(name);
+                        break;
+                    case SpiceManager.SpiceState.Lending:
+                        lbSpicesLending.Items.Add(name);
+                        break;
+                    case SpiceManager.SpiceState.Lent:
+                        lbSpicesLent.Items.Add(name);
+                        break;
+                    case SpiceManager.SpiceState.Storing:
+                        lbSpicesStoring.Items.Add(name);
+                        break;
+                }
+            }
         }
 
         private void comboBox1_DropDown(object sender, EventArgs e)
@@ -194,7 +168,11 @@ namespace formApp
             bytes[0] = 255;
             bytes[1] = (byte) command;
             bytes[2] = (byte) index;
-            serialPort1.Write(bytes, 0, 3);
+
+            try
+            { serialPort1.Write(bytes, 0, 3); }
+            catch
+            { Console.WriteLine("Error! Serial port could not write"); }
         }
 
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -224,11 +202,17 @@ namespace formApp
                     startCount--;
                     if (item == 0)
                     {
-                        confirmRequestSpice(lbSpicesRequesting.Items[0]);
+                        spiceManager.UpdateState(
+                            lbSpicesLending.Items[0].ToString(),
+                            SpiceManager.SpiceState.Lent
+                        );
                     }
                     else if (item == 1)
                     {
-                        confirmReturnSpice(lbSpicesReturning.Items[0]);
+                        spiceManager.UpdateState(
+                            lbSpicesStoring.Items[0].ToString(),
+                            SpiceManager.SpiceState.Stored
+                        );
                     }
                 }
             }
