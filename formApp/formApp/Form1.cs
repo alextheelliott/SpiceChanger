@@ -255,6 +255,8 @@ namespace formApp
             { MessageBox.Show("Must first select a spice to add!","Error!"); return; }
 
             int index = spiceManager.AddSpice(lbAdd.SelectedItem.ToString());
+            if (index == -1)
+            { MessageBox.Show("Spice already added, duplicates are not allowed!","Error!"); return; }
             SendPacket(SpiceManager.Commands.Return, index);
 
             UpdateListBoxes();
@@ -264,10 +266,13 @@ namespace formApp
         {
             string newSpice = NewSpicePrompt.ShowDialog("Enter New Spice Option:","Add New");
             
-            spiceManager.AddOption(newSpice);
+            if (!spiceManager.AddOption(newSpice))
+            { MessageBox.Show($"{newSpice} already exists as an option!","Error!"); return; }
             SetupGrammer();
 
             int index = spiceManager.AddSpice(newSpice);
+            if (index == -1)
+            { MessageBox.Show("Spice already added, duplicates are not allowed!","Error!"); return; }
             SendPacket(SpiceManager.Commands.Return, index);
             
             UpdateListBoxes();
