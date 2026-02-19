@@ -218,7 +218,7 @@ namespace formApp
                 if (dataQueue.TryDequeue(out int item))
                 {
                     startCount--;
-                    if (item == 0)
+                    if (item == 1)
                     {
                         (string spice, int index, SpiceManager.SpiceState state) = spiceManager.State[lbSpicesLending.Items[0].ToString()];
                         if (state != SpiceManager.SpiceState.Removing)
@@ -233,7 +233,7 @@ namespace formApp
                             spiceManager.RemoveSpice(spice);
                         }
                     }
-                    else if (item == 1)
+                    else if (item == 2)
                     {
                         spiceManager.UpdateState(
                             lbSpicesStoring.Items[0].ToString(),
