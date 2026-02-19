@@ -30,16 +30,18 @@ namespace formApp
             Lending,
             Lent,
             Storing,
+            Removing,
         }
 
         public static string State2String(SpiceState state)
         {
             switch (state)
             {
-                case SpiceState.Stored:  return "Stored";
-                case SpiceState.Lending: return "Lending";
-                case SpiceState.Lent:    return "Lent";
-                case SpiceState.Storing: return "Storing";
+                case SpiceState.Stored:   return "Stored";
+                case SpiceState.Lending:  return "Lending";
+                case SpiceState.Lent:     return "Lent";
+                case SpiceState.Storing:  return "Storing";
+                case SpiceState.Removing: return "Removing";
                 default: return "Default";
             }
         }
@@ -48,10 +50,11 @@ namespace formApp
         {
             switch (state)
             {
-                case "Stored":  return SpiceState.Stored;
-                case "Lending": return SpiceState.Lending;
-                case "Lent":    return SpiceState.Lent;
-                case "Storing": return SpiceState.Storing;
+                case "Stored":   return SpiceState.Stored;
+                case "Lending":  return SpiceState.Lending;
+                case "Lent":     return SpiceState.Lent;
+                case "Storing":  return SpiceState.Storing;
+                case "Removing": return SpiceState.Removing;
                 default: return SpiceState.Default;
             }
         }
@@ -198,19 +201,19 @@ namespace formApp
             return -1;
         }
 
-        public bool AddSpice(string spice, int index = -1, SpiceState state = SpiceState.Stored)
+        public int AddSpice(string spice, int index = -1, SpiceState state = SpiceState.Storing)
         {
             if (!_spiceState.ContainsKey(spice))
             {
                 if (index == -1) { index = GetNextEmptyIndex(); }
-                if (index == -1) { return false; } // if still -1 no more indexes are available
+                if (index == -1) { return -1; } // if still -1 no more indexes are available
 
                 _spiceState.Add(spice,(spice,index,state));
 
                 if (UPDATE_CSVS) { SaveSpiceState(); }
-                return true;
+                return index;
             }
-            return false;
+            return -1;
         }
 
         public bool AddOption(string spice)
@@ -233,9 +236,9 @@ namespace formApp
                 _spiceState.Remove(spice);
 
                 if (UPDATE_CSVS) { SaveSpiceState(); }
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
         public Grammar BuildGrammer()

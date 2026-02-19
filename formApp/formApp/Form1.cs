@@ -24,10 +24,11 @@ namespace formApp
             InitializeComponent();
             UpdateListBoxes();
             
-            spiceManager.UpdateListBox(SpiceManager.SpiceState.Stored,  lbSpicesStored);
-            spiceManager.UpdateListBox(SpiceManager.SpiceState.Lending, lbSpicesLending);
-            spiceManager.UpdateListBox(SpiceManager.SpiceState.Lent,    lbSpicesLent);
-            spiceManager.UpdateListBox(SpiceManager.SpiceState.Storing, lbSpicesStoring);
+            spiceManager.UpdateListBox(SpiceManager.SpiceState.Stored,   lbSpicesStored);
+            spiceManager.UpdateListBox(SpiceManager.SpiceState.Lending,  lbSpicesLending);
+            spiceManager.UpdateListBox(SpiceManager.SpiceState.Lent,     lbSpicesLent);
+            spiceManager.UpdateListBox(SpiceManager.SpiceState.Storing,  lbSpicesStoring);
+            spiceManager.UpdateListBox(SpiceManager.SpiceState.Removing, lbSpicesLending);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -133,6 +134,9 @@ namespace formApp
                     case SpiceManager.SpiceState.Storing:
                         lbSpicesStoring.Items.Add(name);
                         break;
+                    case SpiceManager.SpiceState.Removing:
+                        lbSpicesLending.Items.Add(name);
+                        break;
                 }
 
                 lbRemove.Items.Add(name);
@@ -216,10 +220,18 @@ namespace formApp
                     startCount--;
                     if (item == 0)
                     {
-                        spiceManager.UpdateState(
-                            lbSpicesLending.Items[0].ToString(),
-                            SpiceManager.SpiceState.Lent
-                        );
+                        (string spice, int index, SpiceManager.SpiceState state) = spiceManager.State[lbSpicesLending.Items[0].ToString()];
+                        if (state != SpiceManager.SpiceState.Removing)
+                        {
+                            spiceManager.UpdateState(
+                                spice,
+                                SpiceManager.SpiceState.Lent
+                            );
+                        }
+                        else
+                        {
+                            spiceManager.RemoveSpice(spice);
+                        }
                     }
                     else if (item == 1)
                     {
@@ -242,7 +254,9 @@ namespace formApp
             if (lbAdd.SelectedItem == null)
             { MessageBox.Show("Must first select a spice to add!","Error!"); return; }
 
-            spiceManager.AddSpice(lbAdd.SelectedItem.ToString());
+            int index = spiceManager.AddSpice(lbAdd.SelectedItem.ToString());
+            SendPacket(SpiceManager.Commands.Return, index);
+
             UpdateListBoxes();
         }
 
@@ -251,14 +265,28 @@ namespace formApp
             string newSpice = NewSpicePrompt.ShowDialog("Enter New Spice Option:","Add New");
             
             spiceManager.AddOption(newSpice);
-            spiceManager.AddSpice(newSpice);
             SetupGrammer();
+
+            int index = spiceManager.AddSpice(newSpice);
+            SendPacket(SpiceManager.Commands.Return, index);
+            
             UpdateListBoxes();
         }
 
         private void btnRemoveSpice_Click(object sender, EventArgs e)
         {
-            spiceManager.RemoveSpice(lbRemove.SelectedItem.ToString());
+            (_, _, SpiceManager.SpiceState state) = spiceManager.State[lbRemove.SelectedItem.ToString()];
+            if (state == SpiceManager.SpiceState.Removing)
+            { MessageBox.Show("Spice already queued for removal!","Error!"); return; }
+
+            int index = spiceManager.UpdateState(
+                lbRemove.SelectedItem.ToString(),
+                SpiceManager.SpiceState.Removing
+            );
+            SendPacket(SpiceManager.Commands.Request, index);
+
+            MessageBox.Show("Spice removal has been queued!","Success!");
+
             UpdateListBoxes();
         }
     }
