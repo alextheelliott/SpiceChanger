@@ -40,16 +40,26 @@
             this.lbSpicesStoring = new System.Windows.Forms.ListBox();
             this.lbSpicesLending = new System.Windows.Forms.ListBox();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btnNewSpice = new System.Windows.Forms.Button();
+            this.btnAddSpice = new System.Windows.Forms.Button();
+            this.lbAdd = new System.Windows.Forms.ListBox();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.btnConn = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.btnVoiceReq = new System.Windows.Forms.Button();
+            this.lbRemove = new System.Windows.Forms.ListBox();
+            this.btnRemoveSpice = new System.Windows.Forms.Button();
             this.gb1.SuspendLayout();
             this.gb2.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -79,7 +89,7 @@
             // 
             // btnReq
             // 
-            this.btnReq.Location = new System.Drawing.Point(10, 300);
+            this.btnReq.Location = new System.Drawing.Point(11, 300);
             this.btnReq.Name = "btnReq";
             this.btnReq.Size = new System.Drawing.Size(226, 42);
             this.btnReq.TabIndex = 3;
@@ -104,14 +114,14 @@
             this.lbSpicesLent.ItemHeight = 25;
             this.lbSpicesLent.Items.AddRange(new object[] {
             ""});
-            this.lbSpicesLent.Location = new System.Drawing.Point(12, 30);
+            this.lbSpicesLent.Location = new System.Drawing.Point(10, 30);
             this.lbSpicesLent.Name = "lbSpicesLent";
             this.lbSpicesLent.Size = new System.Drawing.Size(226, 254);
             this.lbSpicesLent.TabIndex = 2;
             // 
             // btnRet
             // 
-            this.btnRet.Location = new System.Drawing.Point(12, 300);
+            this.btnRet.Location = new System.Drawing.Point(10, 300);
             this.btnRet.Name = "btnRet";
             this.btnRet.Size = new System.Drawing.Size(230, 42);
             this.btnRet.TabIndex = 5;
@@ -151,7 +161,7 @@
             this.lbSpicesStoring.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.lbSpicesStoring.FormattingEnabled = true;
             this.lbSpicesStoring.ItemHeight = 25;
-            this.lbSpicesStoring.Location = new System.Drawing.Point(271, 196);
+            this.lbSpicesStoring.Location = new System.Drawing.Point(270, 196);
             this.lbSpicesStoring.Name = "lbSpicesStoring";
             this.lbSpicesStoring.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.lbSpicesStoring.Size = new System.Drawing.Size(256, 154);
@@ -163,7 +173,7 @@
             this.lbSpicesLending.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
             this.lbSpicesLending.FormattingEnabled = true;
             this.lbSpicesLending.ItemHeight = 25;
-            this.lbSpicesLending.Location = new System.Drawing.Point(271, 24);
+            this.lbSpicesLending.Location = new System.Drawing.Point(270, 24);
             this.lbSpicesLending.Name = "lbSpicesLending";
             this.lbSpicesLending.SelectionMode = System.Windows.Forms.SelectionMode.None;
             this.lbSpicesLending.Size = new System.Drawing.Size(256, 154);
@@ -171,6 +181,8 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.groupBox2);
+            this.tabPage2.Controls.Add(this.groupBox1);
             this.tabPage2.Location = new System.Drawing.Point(8, 39);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
@@ -178,6 +190,58 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Restock";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.btnRemoveSpice);
+            this.groupBox2.Controls.Add(this.lbRemove);
+            this.groupBox2.Location = new System.Drawing.Point(404, 6);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(388, 358);
+            this.groupBox2.TabIndex = 1;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Remove Spice";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.btnNewSpice);
+            this.groupBox1.Controls.Add(this.btnAddSpice);
+            this.groupBox1.Controls.Add(this.lbAdd);
+            this.groupBox1.Location = new System.Drawing.Point(6, 6);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(388, 358);
+            this.groupBox1.TabIndex = 0;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Add New Spice";
+            // 
+            // btnNewSpice
+            // 
+            this.btnNewSpice.Location = new System.Drawing.Point(197, 300);
+            this.btnNewSpice.Name = "btnNewSpice";
+            this.btnNewSpice.Size = new System.Drawing.Size(180, 42);
+            this.btnNewSpice.TabIndex = 2;
+            this.btnNewSpice.Text = "New";
+            this.btnNewSpice.UseVisualStyleBackColor = true;
+            this.btnNewSpice.Click += new System.EventHandler(this.btnNewSpice_Click);
+            // 
+            // btnAddSpice
+            // 
+            this.btnAddSpice.Location = new System.Drawing.Point(11, 300);
+            this.btnAddSpice.Name = "btnAddSpice";
+            this.btnAddSpice.Size = new System.Drawing.Size(180, 42);
+            this.btnAddSpice.TabIndex = 1;
+            this.btnAddSpice.Text = "Add";
+            this.btnAddSpice.UseVisualStyleBackColor = true;
+            this.btnAddSpice.Click += new System.EventHandler(this.btnAddSpice_Click);
+            // 
+            // lbAdd
+            // 
+            this.lbAdd.FormattingEnabled = true;
+            this.lbAdd.ItemHeight = 25;
+            this.lbAdd.Location = new System.Drawing.Point(10, 30);
+            this.lbAdd.Name = "lbAdd";
+            this.lbAdd.Size = new System.Drawing.Size(364, 254);
+            this.lbAdd.TabIndex = 0;
             // 
             // tabPage3
             // 
@@ -227,6 +291,25 @@
             this.btnVoiceReq.UseVisualStyleBackColor = true;
             this.btnVoiceReq.Click += new System.EventHandler(this.btnVoiceReq_Click);
             // 
+            // lbRemove
+            // 
+            this.lbRemove.FormattingEnabled = true;
+            this.lbRemove.ItemHeight = 25;
+            this.lbRemove.Location = new System.Drawing.Point(10, 30);
+            this.lbRemove.Name = "lbRemove";
+            this.lbRemove.Size = new System.Drawing.Size(364, 254);
+            this.lbRemove.TabIndex = 3;
+            // 
+            // btnRemoveSpice
+            // 
+            this.btnRemoveSpice.Location = new System.Drawing.Point(10, 300);
+            this.btnRemoveSpice.Name = "btnRemoveSpice";
+            this.btnRemoveSpice.Size = new System.Drawing.Size(364, 42);
+            this.btnRemoveSpice.TabIndex = 4;
+            this.btnRemoveSpice.Text = "Remove";
+            this.btnRemoveSpice.UseVisualStyleBackColor = true;
+            this.btnRemoveSpice.Click += new System.EventHandler(this.btnRemoveSpice_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -242,6 +325,9 @@
             this.gb2.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -266,6 +352,13 @@
         private System.IO.Ports.SerialPort serialPort1;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button btnVoiceReq;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.ListBox lbAdd;
+        private System.Windows.Forms.Button btnNewSpice;
+        private System.Windows.Forms.Button btnAddSpice;
+        private System.Windows.Forms.Button btnRemoveSpice;
+        private System.Windows.Forms.ListBox lbRemove;
     }
 }
 

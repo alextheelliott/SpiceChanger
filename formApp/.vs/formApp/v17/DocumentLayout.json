@@ -17,6 +17,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|C:\\projects\\SpiceChanger\\formApp\\formapp\\pythonrunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|solutionrelative:formapp\\pythonrunner.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|c:\\projects\\spicechanger\\formapp\\formapp\\newspiceprompt.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9D6DFD0C-7F00-4ECD-8D96-C5F011273500}|formApp\\formApp.csproj|solutionrelative:formapp\\newspiceprompt.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,8 +30,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "NewSpicePrompt.cs",
+              "DocumentMoniker": "C:\\projects\\SpiceChanger\\formApp\\formApp\\NewSpicePrompt.cs",
+              "RelativeDocumentMoniker": "formApp\\NewSpicePrompt.cs",
+              "ToolTip": "C:\\projects\\SpiceChanger\\formApp\\formApp\\NewSpicePrompt.cs",
+              "RelativeToolTip": "formApp\\NewSpicePrompt.cs",
+              "ViewState": "AgIAAAsAAABYZmZmZqY+wBAAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-02-19T00:08:09.924Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 3,
@@ -38,7 +55,8 @@
               "RelativeToolTip": "formApp\\PythonRunner.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-07T07:11:15.213Z"
+              "WhenOpened": "2025-12-07T07:11:15.213Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -48,7 +66,7 @@
               "RelativeDocumentMoniker": "formApp\\SpiceManager.cs",
               "ToolTip": "C:\\projects\\SpiceChanger\\formApp\\formApp\\SpiceManager.cs",
               "RelativeToolTip": "formApp\\SpiceManager.cs",
-              "ViewState": "AgIAADAAAAAA/v////8TwDsAAAA/AAAAAAAAAA==",
+              "ViewState": "AgIAAOMAAAAAU2ZmZmYcwO0AAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-05T05:40:04.395Z",
               "EditorCaption": ""
@@ -61,7 +79,7 @@
               "RelativeDocumentMoniker": "formApp\\Form1.cs",
               "ToolTip": "C:\\projects\\SpiceChanger\\formApp\\formApp\\Form1.cs",
               "RelativeToolTip": "formApp\\Form1.cs",
-              "ViewState": "AgIAAKYAAAAgzczMzAwswLYAAAAyAAAAAAAAAA==",
+              "ViewState": "AgIAAPcAAAAAgjMzMzMHwAYBAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-12-05T07:24:25.928Z",
               "EditorCaption": ""

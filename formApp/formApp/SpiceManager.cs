@@ -14,6 +14,9 @@ namespace formApp
         private Dictionary<string,(string,int,SpiceState)> _spiceState;
         private Dictionary<SpiceState,ListBox> _listBoxes;
 
+        private const int MAX_INDEX = 8;
+        private const bool UPDATE_CSVS = false;
+
         public enum Commands
         {
             Request,
@@ -91,7 +94,7 @@ namespace formApp
 
         private void LoadSpiceState()
         {
-            using(StreamReader reader = new StreamReader("saveState.csv"))
+            using (StreamReader reader = new StreamReader("saveState.csv"))
             {
                 string header = reader.ReadLine();
 
@@ -108,10 +111,23 @@ namespace formApp
             }
         }
 
-        private void SaveSpiceState()
+        public void SaveSpiceOptions()
         {
-            using(StreamWriter writer = new StreamWriter("spiceDictionary.csv"))
+            using (StreamWriter writer = new StreamWriter("spiceDictionary.csv"))
             {
+                foreach (string spice in _spiceOptions)
+                {
+                    writer.WriteLine(spice);
+                }
+            }
+        }
+
+        public void SaveSpiceState()
+        {
+            using (StreamWriter writer = new StreamWriter("spiceDictionary.csv"))
+            {
+                writer.WriteLine("Name,Index,State"); // header
+
                 foreach (KeyValuePair<string,(string,int,SpiceState)> entry in _spiceState)
                 {
                     (string name, int index, SpiceState state) = entry.Value;
@@ -120,9 +136,31 @@ namespace formApp
             }
         }
 
+        public List<string> Options
+        {
+            get { return new List<string>(_spiceOptions); }
+        }
+
         public Dictionary<string,(string,int,SpiceState)> State
         {
             get { return new Dictionary<string,(string,int,SpiceState)>(_spiceState); }
+        }
+
+        private int GetNextEmptyIndex()
+        {
+            HashSet<int> filledIndicies = new HashSet<int>();
+
+            foreach (KeyValuePair<string,(string,int,SpiceState)> entry in _spiceState)
+            {
+                (_, int index, _) = entry.Value;
+                filledIndicies.Add(index);
+            }
+
+            for (int i = 1; i <= MAX_INDEX; i++)
+            {
+                if (!filledIndicies.Contains(i)) return i;
+            }
+            return -1;
         }
 
         public void UpdateListBox(SpiceState state, ListBox listBox)
@@ -160,22 +198,44 @@ namespace formApp
             return -1;
         }
 
-        public int AddSpice(string spice, int index, SpiceState state)
+        public bool AddSpice(string spice, int index = -1, SpiceState state = SpiceState.Stored)
         {
             if (!_spiceState.ContainsKey(spice))
             {
+                if (index == -1) { index = GetNextEmptyIndex(); }
+                if (index == -1) { return false; } // if still -1 no more indexes are available
+
                 _spiceState.Add(spice,(spice,index,state));
+
+                if (UPDATE_CSVS) { SaveSpiceState(); }
+                return true;
             }
-            return -1;
+            return false;
         }
 
-        public int RemoveSpice(string spice)
+        public bool AddOption(string spice)
+        {
+            if (!_spiceOptions.Contains(spice))
+            {
+                _spiceOptions.Add(spice);
+                _spiceOptions.Sort();
+                
+                if (UPDATE_CSVS) { SaveSpiceOptions(); }
+                return true;
+            }
+            return false;
+        }
+
+        public bool RemoveSpice(string spice)
         {
             if (_spiceState.ContainsKey(spice))
             {
                 _spiceState.Remove(spice);
+
+                if (UPDATE_CSVS) { SaveSpiceState(); }
+                return true;
             }
-            return -1;
+            return false;
         }
 
         public Grammar BuildGrammer()

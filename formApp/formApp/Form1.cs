@@ -22,7 +22,7 @@ namespace formApp
             dataQueue = new ConcurrentQueue<Int32>();
 
             InitializeComponent();
-            updateListBoxes();
+            UpdateListBoxes();
             
             spiceManager.UpdateListBox(SpiceManager.SpiceState.Stored,  lbSpicesStored);
             spiceManager.UpdateListBox(SpiceManager.SpiceState.Lending, lbSpicesLending);
@@ -33,20 +33,24 @@ namespace formApp
         private void Form1_Load(object sender, EventArgs e)
         {
             timer1.Start();
+            SetupGrammer();
+        }
 
+        private void SetupGrammer()
+        {
             recognizer.SetInputToDefaultAudioDevice();
             recognizer.UnloadAllGrammars();
             recognizer.LoadGrammar(spiceManager.BuildGrammer());
-            recognizer.SpeechRecognized += handleSpeechRecognized;
+            recognizer.SpeechRecognized += HandleSpeechRecognized;
         }
 
-        private void handleSpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        private void HandleSpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
             if (lbSpicesStored.FindStringExact(e.Result.Text) != ListBox.NoMatches)
             {
-                resetTimeout();
+                ResetTimeout();
                 object spice = lbSpicesStored.Items[lbSpicesStored.FindStringExact(e.Result.Text)];
-                requestSpice(spice);
+                RequestSpice(spice);
             }
         }
 
@@ -54,10 +58,10 @@ namespace formApp
         {
             Console.WriteLine("STARTING");
             recognizer.RecognizeAsync(RecognizeMode.Multiple);
-            resetTimeout();
+            ResetTimeout();
         }
 
-        private async void resetTimeout()
+        private async void ResetTimeout()
         {
             voiceTimeout?.Cancel();
             voiceTimeout = new CancellationTokenSource();
@@ -73,16 +77,16 @@ namespace formApp
             // expected when speech happens again
         }
 
-        private void requestSpice(object spice)
+        private void RequestSpice(object spice)
         {
             int index = spiceManager.UpdateState(spice.ToString(), SpiceManager.SpiceState.Lending);
-            sendPacket(SpiceManager.Commands.Request, index);
+            SendPacket(SpiceManager.Commands.Request, index);
         }
 
-        private void returnSpice(object spice)
+        private void ReturnSpice(object spice)
         {
             int index = spiceManager.UpdateState(spice.ToString(), SpiceManager.SpiceState.Storing);
-            sendPacket(SpiceManager.Commands.Return, index);
+            SendPacket(SpiceManager.Commands.Return, index);
         }
 
         private void btnReq_Click(object sender, EventArgs e)
@@ -90,7 +94,7 @@ namespace formApp
             if (lbSpicesStored.SelectedItem == null)
             { MessageBox.Show("Must first select a spice to request!","Error!"); return; }
 
-            requestSpice(lbSpicesStored.SelectedItem);
+            RequestSpice(lbSpicesStored.SelectedItem);
         }
 
         private void btnRet_Click(object sender, EventArgs e)
@@ -98,15 +102,18 @@ namespace formApp
             if (lbSpicesLent.SelectedItem == null)
             { MessageBox.Show("Must first select a spice to return!","Error!"); return; }
 
-            returnSpice(lbSpicesLent.SelectedItem);
+            ReturnSpice(lbSpicesLent.SelectedItem);
         }
 
-        private void updateListBoxes()
+        private void UpdateListBoxes()
         {
             lbSpicesStored.Items.Clear();
             lbSpicesLending.Items.Clear();
             lbSpicesLent.Items.Clear();
             lbSpicesStoring.Items.Clear();
+            
+            lbAdd.Items.Clear();
+            lbRemove.Items.Clear();
 
             foreach (KeyValuePair<string,(string,int,SpiceManager.SpiceState)> entry in spiceManager.State)
             {
@@ -127,6 +134,13 @@ namespace formApp
                         lbSpicesStoring.Items.Add(name);
                         break;
                 }
+
+                lbRemove.Items.Add(name);
+            }
+
+            foreach(string spice in spiceManager.Options)
+            {
+                lbAdd.Items.Add(spice);
             }
         }
 
@@ -162,7 +176,7 @@ namespace formApp
             }
         }
 
-        private void sendPacket(SpiceManager.Commands command, int index)
+        private void SendPacket(SpiceManager.Commands command, int index)
         {
             byte[] bytes = new byte[3];
             bytes[0] = 255;
@@ -220,8 +234,32 @@ namespace formApp
 
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            updateListBoxes();
+            UpdateListBoxes();
         }
 
+        private void btnAddSpice_Click(object sender, EventArgs e)
+        {
+            if (lbAdd.SelectedItem == null)
+            { MessageBox.Show("Must first select a spice to add!","Error!"); return; }
+
+            spiceManager.AddSpice(lbAdd.SelectedItem.ToString());
+            UpdateListBoxes();
+        }
+
+        private void btnNewSpice_Click(object sender, EventArgs e)
+        {
+            string newSpice = NewSpicePrompt.ShowDialog("Enter New Spice Option:","Add New");
+            
+            spiceManager.AddOption(newSpice);
+            spiceManager.AddSpice(newSpice);
+            SetupGrammer();
+            UpdateListBoxes();
+        }
+
+        private void btnRemoveSpice_Click(object sender, EventArgs e)
+        {
+            spiceManager.RemoveSpice(lbRemove.SelectedItem.ToString());
+            UpdateListBoxes();
+        }
     }
 }
