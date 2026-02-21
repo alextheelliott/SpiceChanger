@@ -13,7 +13,7 @@
 #define BUFFER_SIZE 50
 #define START_BYTE 255
 #define DC_DEADBAND 5
-#define DEFAULT_SATURATION 55
+#define DEFAULT_SATURATION 70
 #define DC_KP 10125 //0.309 * 32768
 //#define TICKS_PER_INDEX 76.5
 #define TICKS_PER_INDEX 71.62
@@ -228,17 +228,17 @@ void init(void) {
     P1REN |= BIT3;    // Enable pull resistor (optional but recommended)
     P1OUT &= ~BIT3;   // pull-down (change to |= BIT3 for pull-up)
     // Read initial state
-    spiceSeen = !(P1IN & BIT3);
+    // spiceSeen = !(P1IN & BIT3);
 
-    // Interrupt edge select:
-    if (P1IN & BIT3)
-        P1IES |= BIT3;     // High → Low
-    else
-        P1IES &= ~BIT3;    // Low → High
+    // // Interrupt edge select:
+    // if (P1IN & BIT3)
+    //     P1IES |= BIT3;     // High → Low
+    // else
+    //     P1IES &= ~BIT3;    // Low → High
 
-    // Clear any pending interrupt & Enable interrupt
-    P1IFG &= ~BIT3;
-    P1IE |= BIT3;
+    // // Clear any pending interrupt & Enable interrupt
+    // P1IFG &= ~BIT3;
+    // P1IE |= BIT3;
 
     // Limit Switch
     // Configure P2.4 to P2.3 as circuit
@@ -422,7 +422,7 @@ void stateMachine(void) {
             if (stepsRem < 1) { state = 15; }
             break;
         case 15: // Give Spice - Step 5 - Wait until the user TAKES the container (IR sensor)
-            if (!spiceSeen) { state = 16; }
+            if ((P1IN & BIT3)) { state = 16; }
             break;
         case 16: // Give Spice - Step 6 - Retract the pusher arm
             //__delay_cycles(1000000);
@@ -460,7 +460,7 @@ void stateMachine(void) {
             if (stepsRem < 1) { state = 25; }
             break;
         case 25: // Return Spice - Step 5 - Wait until the user RETURNS the container (IR sensor)
-            if (spiceSeen) { state = 26; }
+            if (!(P1IN & BIT3)) { state = 26; }
             break;
         case 26: // Return Spice - Step 6 - Retract the pusher arm
             //__delay_cycles(1000000);
@@ -513,23 +513,23 @@ void main (void) {
 
 // ====================================================================== ISRs
 
-#pragma vector=PORT1_VECTOR
-__interrupt void Port_1_ISR(void) {
-    if (P1IFG & BIT3) {
-        if (P1IN & BIT3) {
-            spiceSeen = false;
-            P1IES |= BIT3; // next interrupt on falling edge
-            //uartQueueTransmit(22);
-        } else {
-            spiceSeen = true;
-            P1IES &= ~BIT3; // next interrupt on rising edge
-           //uartQueueTransmit(23);
-        }
+// #pragma vector=PORT1_VECTOR
+// __interrupt void Port_1_ISR(void) {
+//     if (P1IFG & BIT3) {
+//         if (P1IN & BIT3) {
+//             spiceSeen = false;
+//             P1IES |= BIT3; // next interrupt on falling edge
+//             //uartQueueTransmit(22);
+//         } else {
+//             spiceSeen = true;
+//             P1IES &= ~BIT3; // next interrupt on rising edge
+//            //uartQueueTransmit(23);
+//         }
 
-        // Clear flag
-        P1IFG &= ~BIT3;
-    }
-}
+//         // Clear flag
+//         P1IFG &= ~BIT3;
+//     }
+// }
 
 #pragma vector=PORT2_VECTOR
 __interrupt void Port_2_ISR(void) {
@@ -553,10 +553,11 @@ __interrupt void TIMER1_B1_ISR(void) {
             TA0R = 0;
             TA1R = 0;
 
-            __disable_interrupt();
+            //__disable_interrupt();
             //control_cmd = mpy_q15(DC_KP,(desTicks - encTicks));
-            control_cmd = pid_compute((desTicks - encTicks));
-            __enable_interrupt();
+            //control_cmd = pid_compute((desTicks - encTicks));
+            control_cmd = 1.3 * (desTicks - encTicks);
+            //__enable_interrupt();
         
             setMotorSpeedDirection(control_cmd);    
 
