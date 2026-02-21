@@ -16,7 +16,7 @@
 #define DEFAULT_SATURATION 55
 #define DC_KP 10125 //0.309 * 32768
 //#define TICKS_PER_INDEX 76.5
-#define TICKS_PER_INDEX 71.612
+#define TICKS_PER_INDEX 71.62
 #define PUSHER_STEPS 294
 
 // ====================================================================== Structs
@@ -56,7 +56,7 @@ volatile float dc_saturation = DEFAULT_SATURATION;
 /* Q11 gains */
 const int16_t x = (int32_t)  2900;
 const int16_t x1 = (int32_t) 2200;
-const int16_t y1 = (int32_t) -1900;
+const int16_t y1 = (int32_t) -2000;
 volatile int16_t control_cmd = 0;
 volatile int32_t prev_input = 0;
 volatile int32_t prev_output = 0;
@@ -176,7 +176,7 @@ void stepMotor(void) {
     // output either the logic high or logic low
     if (bit3) PJOUT |= BIT0; else PJOUT &= ~BIT0;
     if (bit2) PJOUT |= BIT1; else PJOUT &= ~BIT1;
-    if (bit1) PJOUT |= BIT2; else PJOUT &= ~BIT2;
+    if (bit1) P3OUT |= BIT0; else P3OUT &= ~BIT0;
     if (bit0) PJOUT |= BIT3; else PJOUT &= ~BIT3;
 
     stepperState = (stepperState + stepperDir) & 0x07; // increments state and resets to 0 after 7
@@ -248,7 +248,7 @@ void init(void) {
 
     P2DIR &= ~BIT3;      // Set P2.3 as Input
     P2REN |= BIT3;       // Enable internal resistor
-    P2OUT &= ~BIT3;       // Set as Pull-Up (Pin is HIGH when circuit opens)
+    P2OUT &= ~BIT3;       // Set as Pull-Down (Pin is LOW when circuit opens)
 
     P2IES &= ~BIT3;      // Low-to-High transition (Trigger when circuit OPENS)
     P2IFG &= ~BIT3;      // Clear flag
@@ -280,17 +280,25 @@ void init(void) {
     TB0CCR0 = 160 - 1;   // 50 kHz PWM
     TB0CCTL1 = OUTMOD_7;
     TB0CCTL2 = OUTMOD_7;
-    TB0CCR1 = 60 * TB0CCR0 / 100; // Const. for Stepper Moter
+    TB0CCR1 = 50 * TB0CCR0 / 100; // Const. for Stepper Moter
     TB0CCR2 = 0 * TB0CCR0 / 100; // Variable for DC Motor
 
     // set PJ.0-3 to outputs for the offboard motor driver
+    PM5CTL0 &= ~LOCKLPM5; // Gemini said this would help
     PJDIR |= BIT0 | BIT1 | BIT2 | BIT3;
+    PJSEL0 &= ~(BIT0 | BIT1 | BIT2 | BIT3); // Ensure GPIO mode
+    PJSEL1 &= ~(BIT0 | BIT1 | BIT2 | BIT3); // Ensure GPIO mode
+
+    // trial to replace PJ.2
+    P3DIR |= BIT0;
+    P3SEL0 &= ~BIT0;
+    P3SEL1 &= ~BIT0;
 
     TB1CTL = TBSSEL__SMCLK | ID__8 | MC__STOP | TBCLR; 
     TB1CCTL1 = CCIE; 
     TB1CCTL2 = CCIE; 
     TB1CCR1 = 5000 - 1; // 200 Hz, Encoder Update
-    TB1CCR2 = 5000 - 1;  // 2 kHz, Stepper Step Rate
+    TB1CCR2 = 500 - 1;  // 2 kHz, Stepper Step Rate
 
     // ------------------------------------------------------------------ UART1
 
@@ -310,6 +318,8 @@ void init(void) {
 
     UCA1CTLW0 &= ~UCSWRST;  // Initialize eUSCI
     UCA1IE |= UCRXIE;   // Enable USCI_A0 RX interrupt
+
+
 }
 
 // Process a packet from the buffer
@@ -354,7 +364,6 @@ void stateMachine(void) {
                     if (diff > 4)  diff -= 8;
                     else if (diff < -4) diff += 8;
 
-                    
                 }
             }
             break;
@@ -367,17 +376,22 @@ void stateMachine(void) {
             break;
         case 2: // Zero Tray detected
             if (zerodTray) { 
-                desTicks = -(long) TICKS_PER_INDEX;
-                state = 3;
+                desTicks = -(long) 0.5*TICKS_PER_INDEX;
+                state = 4;
             }
             break;
-        case 3: // Zero Tray complete
+        case 3: // Stopping Tray in progress
+            if (abs(desTicks - encTicks) < DC_DEADBAND) { 
+                desTicks = encTicks;
+                state = 4;
+            }
+            break;
+        case 4: // Zero Tray complete
             zerodTray = false;
             desTicks = 0;
             encTicks = 0;
             activeIndex = 0;
             dc_saturation = DEFAULT_SATURATION;
-            uartTransmit(1);
             state = 0;
             break;
         // -------------------------------------------------------------- Give Spice
@@ -395,7 +409,7 @@ void stateMachine(void) {
                 */
 
                 desTicks = encTicks; // Stay put
-                uartQueueTransmit(0x01);
+                
                 state = 13; }
             break;
         case 13: // Give Spice - Step 3 - Extend the pusher arm
@@ -412,6 +426,7 @@ void stateMachine(void) {
             break;
         case 16: // Give Spice - Step 6 - Retract the pusher arm
             //__delay_cycles(1000000);
+            uartTransmit(1);
             stepperDir = -1;
             stepsRem = PUSHER_STEPS;
             state = 17;
@@ -420,7 +435,7 @@ void stateMachine(void) {
             if (stepsRem < 1) { state = 18; }
             break;
         case 18: // Give Spice - Step 8 - Continue onto next task
-            
+        
             state = 0;
             break;
         // -------------------------------------------------------------- Return Spice
@@ -428,13 +443,11 @@ void stateMachine(void) {
             desTicks = encTicks + (long) TICKS_PER_INDEX * diff;
             state = 22;
             break;
-
-            break;
         case 22: // Return Spice - Step 2 - Wait until index matches (encoder ticks is correct)
             if (abs(desTicks - encTicks) < DC_DEADBAND) { 
 
                 desTicks = encTicks; // Stay put
-                uartQueueTransmit(0x01);
+            
                 state = 23; }
             break;
         case 23: // Return Spice - Step 3 - Extend the pusher arm
@@ -451,6 +464,7 @@ void stateMachine(void) {
             break;
         case 26: // Return Spice - Step 6 - Retract the pusher arm
             //__delay_cycles(1000000);
+            uartTransmit(2);
             stepperDir = -1;
             stepsRem = PUSHER_STEPS;
             state = 27;
@@ -470,21 +484,30 @@ void stateMachine(void) {
 void main (void) {
     init();
     __bis_SR_register(GIE);  // Enable interrupts globally
+    int temp_state = state;
 
     // ------------------------------------------------------------------ Main Loop
 
     while (1) {
+
+        
         if (rxBuffer.count >= 3) {  // Ensure enough bytes for a full packet
             processPacket();  // Process incoming packet
         }
-
+        
         if (txBuffer.count > 0) {
             // If TX buffer is ready, send data
             if (UCA1IFG & UCTXIFG) UCA1TXBUF = bufferPop(&txBuffer); 
         }
 
+
         stateMachine();
+        if (temp_state != state)
+            //uartQueueTransmit(state);
+        temp_state = state;
+        
         //if (state == 13 || state == 17) {__delay_cycles(1000000);} // a short delay before the arm retracts
+        
     }
 }
 
@@ -496,13 +519,15 @@ __interrupt void Port_1_ISR(void) {
         if (P1IN & BIT3) {
             spiceSeen = false;
             P1IES |= BIT3; // next interrupt on falling edge
+            //uartQueueTransmit(22);
         } else {
             spiceSeen = true;
             P1IES &= ~BIT3; // next interrupt on rising edge
+           //uartQueueTransmit(23);
         }
 
         // Clear flag
-        P1IFG &= ~BIT7;
+        P1IFG &= ~BIT3;
     }
 }
 
@@ -511,7 +536,7 @@ __interrupt void Port_2_ISR(void) {
     if (P2IFG & BIT3) {
 
         if (P2IN & BIT3) {
-            //uartQueueTransmit(23);
+            //uartQueueTransmit(24);
             zerodTray = true;
         } 
 
@@ -555,7 +580,7 @@ __interrupt void USCI_A1_ISR(void) {
     if (started == 0) {
         started = 1;
         TB1CTL = TBSSEL__SMCLK | ID__8 | MC__CONTINOUS | TBCLR; 
-    }
+    } 
 
     unsigned char RxByte = 0;
     RxByte = UCA1RXBUF; // Get the new byte from the Rx buffer
