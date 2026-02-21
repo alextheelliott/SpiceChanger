@@ -159,7 +159,7 @@ namespace formApp
                 filledIndicies.Add(index);
             }
 
-            for (int i = 1; i <= MAX_INDEX; i++)
+            for (int i = 0; i < MAX_INDEX; i++)
             {
                 if (!filledIndicies.Contains(i)) return i;
             }
