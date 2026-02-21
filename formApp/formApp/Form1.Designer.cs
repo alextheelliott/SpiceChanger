@@ -53,6 +53,7 @@
             this.btnVoiceReq = new System.Windows.Forms.Button();
             this.lbRemove = new System.Windows.Forms.ListBox();
             this.btnRemoveSpice = new System.Windows.Forms.Button();
+            this.btnZero = new System.Windows.Forms.Button();
             this.gb1.SuspendLayout();
             this.gb2.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -245,6 +246,7 @@
             // 
             // tabPage3
             // 
+            this.tabPage3.Controls.Add(this.btnZero);
             this.tabPage3.Controls.Add(this.btnConn);
             this.tabPage3.Controls.Add(this.comboBox1);
             this.tabPage3.Location = new System.Drawing.Point(8, 39);
@@ -310,6 +312,16 @@
             this.btnRemoveSpice.UseVisualStyleBackColor = true;
             this.btnRemoveSpice.Click += new System.EventHandler(this.btnRemoveSpice_Click);
             // 
+            // btnZero
+            // 
+            this.btnZero.Location = new System.Drawing.Point(590, 88);
+            this.btnZero.Name = "btnZero";
+            this.btnZero.Size = new System.Drawing.Size(183, 45);
+            this.btnZero.TabIndex = 2;
+            this.btnZero.Text = "Zero";
+            this.btnZero.UseVisualStyleBackColor = true;
+            this.btnZero.Click += new System.EventHandler(this.btnZero_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
@@ -359,6 +371,7 @@
         private System.Windows.Forms.Button btnAddSpice;
         private System.Windows.Forms.Button btnRemoveSpice;
         private System.Windows.Forms.ListBox lbRemove;
+        private System.Windows.Forms.Button btnZero;
     }
 }
 

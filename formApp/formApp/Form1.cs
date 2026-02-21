@@ -266,6 +266,8 @@ namespace formApp
         {
             string newSpice = NewSpicePrompt.ShowDialog("Enter New Spice Option:","Add New");
             
+            if (newSpice == "")
+            { return; }
             if (!spiceManager.AddOption(newSpice))
             { MessageBox.Show($"{newSpice} already exists as an option!","Error!"); return; }
             SetupGrammer();
@@ -293,6 +295,11 @@ namespace formApp
             MessageBox.Show("Spice removal has been queued!","Success!");
 
             UpdateListBoxes();
+        }
+
+        private void btnZero_Click(object sender, EventArgs e)
+        {
+            SendPacket(SpiceManager.Commands.Request,9);
         }
     }
 }
