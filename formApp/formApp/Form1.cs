@@ -285,15 +285,20 @@ namespace formApp
             (_, _, SpiceManager.SpiceState state) = spiceManager.State[lbRemove.SelectedItem.ToString()];
             if (state == SpiceManager.SpiceState.Removing)
             { MessageBox.Show("Spice already queued for removal!","Error!"); return; }
-
-            int index = spiceManager.UpdateState(
-                lbRemove.SelectedItem.ToString(),
-                SpiceManager.SpiceState.Removing
-            );
-            SendPacket(SpiceManager.Commands.Request, index);
+            else if (state == SpiceManager.SpiceState.Stored) 
+            {
+                int index = spiceManager.UpdateState(
+                    lbRemove.SelectedItem.ToString(),
+                    SpiceManager.SpiceState.Removing
+                );
+                SendPacket(SpiceManager.Commands.Request, index);
+            }
+            else if (state == SpiceManager.SpiceState.Lent)
+            { spiceManager.RemoveSpice(lbRemove.SelectedItem.ToString()); }
+            else
+            { MessageBox.Show("Spice is not in a removable state! (Stored or Lent) Please finish previous action.","Error!"); return; }
 
             MessageBox.Show("Spice removal has been queued!","Success!");
-
             UpdateListBoxes();
         }
 
