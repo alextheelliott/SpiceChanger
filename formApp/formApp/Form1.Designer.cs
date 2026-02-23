@@ -184,10 +184,10 @@
             // 
             this.tabPage2.Controls.Add(this.groupBox2);
             this.tabPage2.Controls.Add(this.groupBox1);
-            this.tabPage2.Location = new System.Drawing.Point(8, 39);
+            this.tabPage2.Location = new System.Drawing.Point(8, 41);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(798, 371);
+            this.tabPage2.Size = new System.Drawing.Size(798, 369);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Restock";
             this.tabPage2.UseVisualStyleBackColor = true;
@@ -249,9 +249,9 @@
             this.tabPage3.Controls.Add(this.btnZero);
             this.tabPage3.Controls.Add(this.btnConn);
             this.tabPage3.Controls.Add(this.comboBox1);
-            this.tabPage3.Location = new System.Drawing.Point(8, 39);
+            this.tabPage3.Location = new System.Drawing.Point(8, 41);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(798, 371);
+            this.tabPage3.Size = new System.Drawing.Size(798, 369);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "COM";
             this.tabPage3.UseVisualStyleBackColor = true;
