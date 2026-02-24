@@ -116,7 +116,7 @@ namespace formApp
 
         public void SaveSpiceOptions()
         {
-            using (StreamWriter writer = new StreamWriter("spiceDictionary.csv"))
+            using (StreamWriter writer = new StreamWriter("spiceOptions.csv"))
             {
                 foreach (string spice in _spiceOptions)
                 {
@@ -127,7 +127,7 @@ namespace formApp
 
         public void SaveSpiceState()
         {
-            using (StreamWriter writer = new StreamWriter("spiceDictionary.csv"))
+            using (StreamWriter writer = new StreamWriter("saveState.csv"))
             {
                 writer.WriteLine("Name,Index,State"); // header
 
@@ -196,6 +196,7 @@ namespace formApp
                     }
                 }
 
+                SaveSpiceState();
                 return index;
             }
             return -1;
@@ -210,7 +211,7 @@ namespace formApp
 
                 _spiceState.Add(spice,(spice,index,state));
 
-                if (UPDATE_CSVS) { SaveSpiceState(); }
+                SaveSpiceState();
                 return index;
             }
             return -1;
@@ -223,7 +224,7 @@ namespace formApp
                 _spiceOptions.Add(spice);
                 _spiceOptions.Sort();
                 
-                if (UPDATE_CSVS) { SaveSpiceOptions(); }
+                SaveSpiceOptions();
                 return true;
             }
             return false;
@@ -235,7 +236,7 @@ namespace formApp
             {
                 _spiceState.Remove(spice);
 
-                if (UPDATE_CSVS) { SaveSpiceState(); }
+                SaveSpiceState();
                 return false;
             }
             return true;

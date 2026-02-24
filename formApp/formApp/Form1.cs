@@ -256,7 +256,7 @@ namespace formApp
 
             int index = spiceManager.AddSpice(lbAdd.SelectedItem.ToString());
             if (index == -1)
-            { MessageBox.Show("Spice already added, duplicates are not allowed!","Error!"); return; }
+            { MessageBox.Show("Spice already added or out of space, duplicates are not allowed!","Error!"); return; }
             SendPacket(SpiceManager.Commands.Return, index);
 
             UpdateListBoxes();
@@ -274,7 +274,7 @@ namespace formApp
 
             int index = spiceManager.AddSpice(newSpice);
             if (index == -1)
-            { MessageBox.Show("Spice already added, duplicates are not allowed!","Error!"); return; }
+            { MessageBox.Show("Spice already added or out of space, duplicates are not allowed!","Error!"); return; }
             SendPacket(SpiceManager.Commands.Return, index);
             
             UpdateListBoxes();
